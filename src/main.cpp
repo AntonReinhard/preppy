@@ -3,15 +3,23 @@
 #include "Utility.h"
 #include "solvers/clasp.h"
 
+#include <string>
+
 using namespace preppy;
 
-int main(/*int argc, char** argv*/) {
+int main(const int argc, char** argv) {
+
+   if (!util::Utility::parseCommandLine(argc, argv)) {
+      exit(0);
+   }
+
+   std::string inputFileName = argv[1];
 
    util::Utility::init();
 
    cnf::CNF testCNF;
 
-   testCNF.readFromFile("../../examples/uf50-01.cnf");
+   testCNF.readFromFile(inputFileName);
 
    util::Utility::logInfo("CNF has ", testCNF.getVariables(), " variables and ", testCNF.size(), " clauses");
 

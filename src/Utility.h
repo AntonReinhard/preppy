@@ -20,7 +20,10 @@ namespace preppy::util {
       // Cleans up anything that needs cleanup
       static void cleanup();
 
-      // Takes a duration and formats it as a string as "[dddd, hh:mm:ss.mmmm]"
+      // Parses the command line, returns false if the program should exit
+      static bool parseCommandLine(const int argc, char** argv);
+
+      // Takes a duration and formats it as a string as "[ss.mmmm]"
       static std::string timeToString(clock::duration time);
 
       // Returns a string containing current real time and date

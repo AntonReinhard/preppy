@@ -23,9 +23,9 @@ namespace preppy::log {
 
     void Logger::logLogo() {
         std::vector<std::string> logoLines = {
-            "",
-            "PREPPY",
-            ""
+            "preppy v0.0.1",
+            "Copyright (C) Anton Reinhard",
+            "License: The MIT License <https://opensource.org/licenses/MIT>"
         };
 
         for (const auto& line : logoLines) {
@@ -58,6 +58,9 @@ namespace preppy::log {
     }
 
     void Logger::logLoggerInfo(const std::string& message) {
+        if (logLevel == NOTHING) {
+            return;
+        }
         std::ostringstream ss;
         ss << this->getCurrentTimeString() << " ";
         ss << message;
@@ -68,7 +71,7 @@ namespace preppy::log {
     void Logger::log(const std::string& message, const LOG_LEVEL logLevel) {
         const std::lock_guard<std::mutex> lock(mutex);
         
-        if (logLevel >= this->logLevel) {
+        if (logLevel <= this->logLevel) {
             std::ostringstream ss;
             ss << this->getCurrentTimeString() << " " << logLineStart(logLevel);
             ss << message;
@@ -87,6 +90,8 @@ namespace preppy::log {
             return "Warning";
         case ERROR:
             return "Error";
+        case NOTHING:
+            return "Nothing";
         default:
             return "Unknown";
         }
@@ -102,6 +107,7 @@ namespace preppy::log {
             return "WARNING: ";
         case ERROR:
             return "ERROR:   ";
+        case NOTHING:   // should never happen, as nothing will be logged with this loglevel
         default:
             return "UNKNOWN: ";
         }

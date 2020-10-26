@@ -11,10 +11,11 @@ namespace preppy::log {
  
     // The logging level, specifies what will be logged and what won't
     enum LOG_LEVEL {
-        DEBUG   = 0,
-        INFO    = 1,
+        NOTHING = 0,
+        ERROR   = 1,
         WARNING = 2,
-        ERROR   = 3
+        INFO    = 3,
+        DEBUG   = 4
     };
 
 }

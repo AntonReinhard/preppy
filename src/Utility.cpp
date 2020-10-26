@@ -13,12 +13,13 @@
 #include <csignal>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <string.h>
 
 namespace preppy::util {
 
    std::unique_ptr<log::Logger> Utility::logger = nullptr;
 
-   log::LOG_LEVEL Utility::GLOBAL_LOG_LEVEL = log::DEBUG;
+   log::LOG_LEVEL Utility::GLOBAL_LOG_LEVEL = log::WARNING;
 
    std::map<std::string, util::clock::time_point> Utility::timerStartPoints;
 
@@ -37,15 +38,55 @@ namespace preppy::util {
       Utility::logger.reset();
    }
 
+   bool Utility::parseCommandLine(const int argc, char** argv) {
+      if (argc <= 1) {
+         std::cout << "Usage: " << argv[0] << " [input cnf file] [options]" << std::endl;
+         return false;
+      }
+
+      if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+         std::cout << "Usage: " << argv[0] << " [input cnf file] [options]" << std::endl;
+         std::cout << "Options:\n"
+            << "    -h        Print this help\n"
+            << "    -v <n>    Sets log level to <n>, 0=NOTHING, 1=ERROR, 2=WARNING (default), 3=INFO, 4=DEBUG"
+            << std::endl;
+         return false;
+      }
+
+      // check that first parameter is an actual file
+      if (!util::Utility::fileExists(argv[1])) {
+         std::cout << "File \"" << argv[1] << "\" doesn't exist" << std::endl;
+         return false;
+      }
+
+      for (auto i = 2; i < argc; ++i) {
+         if (strcmp(argv[i], "-v") == 0) {
+            if (i == argc - 1) { // there has to be a next option
+               std::cout << "-v option expects a log level" << std::endl;
+               return false;
+            }
+            ++i;
+            std::stringstream ss(argv[i]);
+            int tempLogLevel;
+            if (tempLogLevel < 0 || tempLogLevel > log::LOG_LEVEL::DEBUG){
+               std::cout << "Invalid log level: " << tempLogLevel << std::endl;
+               return false;
+            }
+            ss >> tempLogLevel;
+            util::Utility::GLOBAL_LOG_LEVEL = log::LOG_LEVEL(tempLogLevel);
+         }
+      }
+
+      return true;
+   }
+
    std::string Utility::timeToString(const clock::duration time) {
       std::ostringstream ss;
 
-      // days, formatted to 4 digits
-      ss << "[";
-      ss << std::setw(2) << std::setfill('0') << std::chrono::duration_cast<std::chrono::hours>(time).count() << ":";
-      ss << std::setw(2) << std::setfill('0') << std::chrono::duration_cast<std::chrono::minutes>(time).count() % 60 << ":";
-      ss << std::setw(2) << std::setfill('0') << std::chrono::duration_cast<std::chrono::seconds>(time).count() % 60 << ".";
-      ss << std::setw(3) << std::setfill('0') << std::chrono::duration_cast<std::chrono::milliseconds>(time).count() % 1000 << "]";
+      ss << "["
+         << std::setw(3) << std::setfill(' ') << std::chrono::duration_cast<std::chrono::seconds>(time).count() << "."
+         << std::setw(3) << std::setfill('0') << std::chrono::duration_cast<std::chrono::milliseconds>(time).count() % 1000 
+         << "]";
 
       return ss.str();
    }
