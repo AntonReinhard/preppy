@@ -7,7 +7,7 @@ namespace preppy::procedures {
    class Procedure {
    public:
 
-      virtual ~Procedure() = 0;
+      virtual ~Procedure() = default;
 
       // Takes a reference to the formula and works on it
       virtual bool apply(cnf::CNF& formula) = 0;

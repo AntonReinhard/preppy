@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME}
    Model.cpp
    solvers/Solver.cpp
    solvers/clasp.cpp
+   procedures/BackboneSimplification.cpp
 )
 
 target_compile_options(${PROJECT_NAME}

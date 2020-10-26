@@ -2,6 +2,7 @@
 #include "Clause.h"
 #include "Utility.h"
 #include "solvers/clasp.h"
+#include "procedures/BackboneSimplification.h"
 
 #include <string>
 
@@ -28,6 +29,16 @@ int main(const int argc, char** argv) {
    cnf::Model testModel = testSolver.getModel(testCNF);
 
    util::Utility::logInfo("Test model read: ", testModel.toString());
+
+   procedures::BackboneSimplification procedure(std::make_shared<solvers::clasp>(std::chrono::seconds(5)));
+
+   auto backbone = procedure.getBackbone(testCNF);
+
+   util::Utility::logInfo("Computed backbone of the formula with ", backbone.size(), " literals:");
+
+   for (const auto& l : backbone) {
+      util::Utility::logInfo(l);
+   }
 
    util::Utility::cleanup();
 }
