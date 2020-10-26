@@ -23,7 +23,7 @@ namespace preppy::log {
 
     void Logger::logLogo() {
         std::vector<std::string> logoLines = {
-            "preppy v0.0.1",
+            std::string("preppy v") + util::VERSION,
             "Copyright (C) Anton Reinhard",
             "License: The MIT License <https://opensource.org/licenses/MIT>"
         };

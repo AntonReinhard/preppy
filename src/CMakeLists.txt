@@ -1,3 +1,5 @@
+configure_file(definitions.h.in ${CMAKE_CURRENT_SOURCE_DIR}/definitions.h)
+
 add_executable(${PROJECT_NAME}
    main.cpp
    CNF.cpp
