@@ -18,6 +18,13 @@ namespace preppy::cnf {
       // Construct this Clause from a line in a cnf file
       Clause(const std::string& line);
 
+      // Sets the given literal to true, if the clause becomes satisfied through this it will be empty
+      // Returns true if the clause is satisfied afterwards
+      bool setLiteral(const int literal);
+
+      // Renames the literals in the clause from old to new
+      void renameVariable(const unsigned oldVar, const unsigned newVar);
+
       // Get this clause as a human readable string
       std::string toString() const;
 

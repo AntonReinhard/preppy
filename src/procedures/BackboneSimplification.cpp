@@ -1,4 +1,5 @@
 #include "BackboneSimplification.h"
+#include "BooleanConstraintPropagation.h"
 #include "../Model.h"
 #include "../CNF.h"
 #include "../Clause.h"
@@ -22,6 +23,8 @@ namespace preppy::procedures {
    literals BackboneSimplification::getBackbone(cnf::CNF& formula) {
       util::Utility::logDebug("Computing Backbone");
 
+      util::Utility::startTimer("backbone calculation");
+
       // Compute a model
       cnf::Model startingModel = this->solver->getModel(formula);
 
@@ -30,7 +33,7 @@ namespace preppy::procedures {
          return {};
       }
 
-      // Convert Model to a literalSet
+      // Convert Model to a literalSet, this will stay uncompressed the entire time
       literals remainingLiterals;
       for (size_t i = 1; i < startingModel.size(); ++i) {
          if (startingModel[i]) {
@@ -45,34 +48,63 @@ namespace preppy::procedures {
       cnf::CNF workingFormula = formula;
       literals backbone;
 
+      size_t i = 0;
+
+      BooleanConstraintPropagation bcp;
+
       // Main loop
       while (!remainingLiterals.empty()) {
+         ++i;
+         //util::Utility::startTimer("loop");
+
+         // currently used literal, compress
+         const int currentLiteral = /*workingFormula.compress*/(remainingLiterals[0]);
+
          cnf::Clause newLiteralClause;
-         newLiteralClause.push_back(-(remainingLiterals[0]));     // add negated literal
+         newLiteralClause.push_back(-currentLiteral);     // add negated literal
 
          workingFormula.push_back(newLiteralClause);
          cnf::Model model = this->solver->getModel(workingFormula);
          
          if (model.empty()) {
             // if there's no model then the literal is in the backbone
+            // use the uncompressed remaining Literal for the backbone
             backbone.push_back(remainingLiterals[0]);
-            workingFormula.erase(workingFormula.end());           // remove last clause again
+            workingFormula.erase(workingFormula.end());                    // remove last clause again
             
-            cnf::Clause learnedClause;
-            learnedClause.push_back(remainingLiterals[0]);
-            workingFormula.push_back(learnedClause);              // we have learnt this
+            bcp.applySingleLiteral(workingFormula, currentLiteral);        // can propagate the literal we learned
+            //workingFormula.setLiteralBackpropagated(currentLiteral);
+
+            //learnedClause.push_back(remainingLiterals[0]);
+            //workingFormula.push_back(learnedClause);              // we have learned this
+
+            remainingLiterals.erase(remainingLiterals.begin());      // remove the literal that was tried
          }
          else {
-            std::remove_if(remainingLiterals.begin(), remainingLiterals.end(), 
-               [&](int lit) {
-                  return model[std::abs(lit)] == (lit > 0);
-               }
+            //workingFormula.decompress(model);
+            
+            remainingLiterals.erase(remainingLiterals.begin());      // remove the literal that was tried
+
+            remainingLiterals.erase(
+               std::remove_if(remainingLiterals.begin(), remainingLiterals.end(), 
+                  [&](int lit) {
+                     return model[std::abs(lit)] != (lit > 0);
+                  }
+               ),
+               remainingLiterals.end()
             );
+
             workingFormula.erase(workingFormula.end());           // remove last clause again
+
+            if (remainingLiterals.empty()) {                      // just in case remaining literals has been emptied by remove_if
+               break;
+            }
          }
 
-         remainingLiterals.erase(remainingLiterals.begin());      // remove the literal that was tried
+         //util::Utility::logWarning("Loop iteration ", i, " took ", util::Utility::durationToString(util::Utility::stopTimer("loop")));
       }
+
+      util::Utility::logInfo("Backbone computation took ", util::Utility::durationToString(util::Utility::stopTimer("backbone calculation")));
 
       return backbone;
    }

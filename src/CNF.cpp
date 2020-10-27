@@ -15,6 +15,90 @@ namespace preppy::cnf {
 
    }
 
+   void CNF::compress() {
+      util::Utility::logDebug("Compressing CNF by ", this->getMaxVariable() - this->getVariables(), " variables");
+
+      if (this->isCompressed()) {
+         return;
+      }
+
+      // collect all variables used in the formula
+      std::set<unsigned> variables;
+      for (const auto& clause : *this) {
+         for (const int var : clause) {
+            variables.insert(std::abs(var));
+         }
+      }
+
+      // compress
+      for (unsigned i = 1; !variables.empty() && i < *(variables.rbegin()); ++i) {
+         const int maxVar = *(variables.rbegin());
+         
+         // if this variable is missing -> compress
+         if (variables.find(i) == variables.end()) {
+            variables.erase(maxVar);
+            for (auto& clause : *this) {
+               clause.renameVariable(maxVar, i);
+            }
+            this->compressionInformation.emplace_back(maxVar, i, false);
+         }
+      }
+      this->maxVariableDirtyBit = true;
+   }
+
+   int CNF::compress(int literal) {
+      bool sign = (literal > 0);
+      literal = std::abs(literal);
+      for (const auto& step : this->compressionInformation) {
+         if (literal == std::get<0>(step)) {
+            literal = std::get<1>(step);
+         }
+      }
+
+      return sign ? literal : -literal;
+   }
+
+   void CNF::compress(cnf::Model& model) {
+      for (const auto& step : this->compressionInformation) {
+         model[std::get<1>(step)] = model[std::get<0>(step)];
+         model.erase(model.begin() + std::get<0>(step));
+      }
+   }
+
+   void CNF::decompress() {
+      // TODO
+   }
+
+   int CNF::decompress(int literal) {
+      bool sign = (literal > 0);
+      literal = std::abs(literal);
+      
+      for (auto step = this->compressionInformation.rbegin(); step != this->compressionInformation.rend(); ++step) {
+         if (literal == std::get<1>(*step)) {
+            literal = std::get<0>(*step);
+         }
+      }
+
+      return sign ? literal : -literal;
+   }
+
+   void CNF::decompress(cnf::Model& model) {
+      //for (auto step = this->compressionInformation.rbegin(); step != this->compressionInformation.rend(); ++step) {
+      for (auto step : this->compressionInformation) {
+         model.insert(model.begin() + std::get<1>(step), std::get<2>(step));
+      }
+   }
+
+   void CNF::setLiteralBackpropagated(int literal) {
+      // literal is not part of the formula anymore, so take biggest variable and rename it to literal's variable name
+      
+      for (auto& clause : *this) {
+         clause.renameVariable(this->getMaxVariable(), std::abs(literal));
+      }
+      this->maxVariable--;
+      this->compressionInformation.emplace_back(this->getMaxVariable(), std::abs(literal), (literal>0));
+   }
+
    bool CNF::readFromFile(const std::string& filepath) {
       this->name = filepath;
       if (!util::Utility::fileExists(filepath)) {
@@ -161,6 +245,11 @@ namespace preppy::cnf {
 
    bool CNF::isCompressed() {
       return this->getVariables() == this->getMaxVariable();
+   }
+
+   void CNF::setDirtyBitsTrue() {
+      this->maxVariableDirtyBit = true;
+      this->variablesDirtyBit = true;
    }
 
 }

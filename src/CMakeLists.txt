@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
    solvers/Solver.cpp
    solvers/clasp.cpp
    procedures/BackboneSimplification.cpp
+   procedures/BooleanConstraintPropagation.cpp
 )
 
 target_compile_options(${PROJECT_NAME}

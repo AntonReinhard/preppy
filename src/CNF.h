@@ -1,7 +1,9 @@
 #pragma once
 #include "Clause.h"
+#include "Model.h"
 
 #include <vector>
+#include <tuple>
 
 namespace preppy::cnf {
 
@@ -14,6 +16,27 @@ namespace preppy::cnf {
 
       // Creates empty CNF
       CNF();
+
+      // Compresses this formula
+      void compress();
+
+      // Compresses a single literal from the original formula to this version
+      int compress(int literal);
+
+      // Compresses a model of the original formula to a model of this version
+      void compress(cnf::Model& model);
+
+      // Decompresses this formula using the saved compressionInformation
+      void decompress();
+
+      // Decompresses a single literal from this version of the formula to the original
+      int decompress(int literal);
+
+      // Decompresses a model from this version of the formula to the original
+      void decompress(cnf::Model& model);
+
+      // To call when a literal was backpropagated and is now not part of the formula anymore, so it can be compressed again
+      void setLiteralBackpropagated(int literal);
 
       // Generate a string containing this CNF Formula in .cnf format
       std::string toString() const;
@@ -34,6 +57,9 @@ namespace preppy::cnf {
       // Returns true if there are any variables that don't occur in the formula but are smaller than the biggest variable
       bool isCompressed();
 
+      // when changing the formula from the outside, call this to set the dirty bits to true again
+      void setDirtyBitsTrue();
+
    protected:
 
 
@@ -53,6 +79,10 @@ namespace preppy::cnf {
 
       // dirty bit for the maxVariable, if true "maVariable" might be wrong
       bool maxVariableDirtyBit = true;
+
+      // compression information for compressing original models and decompressing models of this to the original
+      // the first number represents the original number, the second the new; the boolean saves if the replaced variable was assigned true or false
+      std::vector<std::tuple<unsigned, unsigned, bool>> compressionInformation;
    };
 
 }

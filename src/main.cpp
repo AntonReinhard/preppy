@@ -22,7 +22,11 @@ int main(const int argc, char** argv) {
 
    testCNF.readFromFile(inputFileName);
 
-   util::Utility::logInfo("CNF has ", testCNF.getVariables(), " variables and ", testCNF.size(), " clauses");
+   util::Utility::logWarning("CNF has ", testCNF.getVariables(), " variables (", testCNF.getMaxVariable(), " max) and ", testCNF.size(), " clauses; Compressing...");
+
+   testCNF.compress();
+
+   util::Utility::logWarning("CNF has ", testCNF.getVariables(), " variables (", testCNF.getMaxVariable(), " max) and ", testCNF.size(), " clauses");
 
    solvers::clasp testSolver(std::chrono::seconds(5));
 
@@ -34,11 +38,12 @@ int main(const int argc, char** argv) {
 
    auto backbone = procedure.getBackbone(testCNF);
 
-   util::Utility::logInfo("Computed backbone of the formula with ", backbone.size(), " literals:");
-
+   std::stringstream ss;
    for (const auto& l : backbone) {
-      util::Utility::logInfo(l);
+      ss << l << " ";
    }
+
+   util::Utility::logInfo("Computed backbone of the formula with ", backbone.size(), " literals: ", ss.str());
 
    util::Utility::cleanup();
 }

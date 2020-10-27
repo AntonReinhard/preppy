@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 namespace preppy::cnf {
 
@@ -20,6 +21,31 @@ namespace preppy::cnf {
       }
       if (ss.rdbuf()->in_avail() != 0) {
          util::Utility::logWarning("Leftover characters in line after parsing clause: ", ss.str());
+      }
+   }
+
+   bool Clause::setLiteral(const int literal) {
+      for (const auto& lit : *this) {
+         if (lit == literal) {
+            return true;
+         }
+      }
+      this->erase(
+         std::remove_if(this->begin(), this->end(),
+            [&](const int lit) {
+               return lit == -literal;
+            }
+         ),
+         this->end()
+      );
+      return false;
+   }
+
+   void Clause::renameVariable(const unsigned oldVar, const unsigned newVar) {
+      for (auto& lit : *this) {
+         if (std::abs(lit) == oldVar) {
+            lit = (lit < 0) ? -newVar : newVar;
+         }
       }
    }
 
