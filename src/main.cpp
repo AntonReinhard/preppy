@@ -20,30 +20,35 @@ int main(const int argc, char** argv) {
 
    cnf::CNF testCNF;
 
+   util::Utility::logOutput("Reading file \"", inputFileName, "\"");
    testCNF.readFromFile(inputFileName);
 
-   util::Utility::logWarning("CNF has ", testCNF.getVariables(), " variables (", testCNF.getMaxVariable(), " max) and ", testCNF.size(), " clauses; Compressing...");
+   auto variables = testCNF.getVariables();
+   auto maxVariable = testCNF.getMaxVariable();
+   auto clauses = testCNF.getClauses();
 
-   testCNF.compress();
+   util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) and ", clauses, " clauses");
 
-   util::Utility::logWarning("CNF has ", testCNF.getVariables(), " variables (", testCNF.getMaxVariable(), " max) and ", testCNF.size(), " clauses");
-
-   solvers::clasp testSolver(std::chrono::seconds(5));
-
-   cnf::Model testModel = testSolver.getModel(testCNF);
-
-   util::Utility::logInfo("Test model read: ", testModel.toString());
-
-   procedures::BackboneSimplification procedure(std::make_shared<solvers::clasp>(std::chrono::seconds(5)));
-
-   auto backbone = procedure.getBackbone(testCNF);
-
-   std::stringstream ss;
-   for (const auto& l : backbone) {
-      ss << l << " ";
+   if (!testCNF.isCompressed()) {
+      util::Utility::logOutput("Formula isn't compressed, compressing...");
+      testCNF.compress();
+      variables = testCNF.getVariables();
+      maxVariable = testCNF.getMaxVariable();
+      util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) after compression");
    }
 
-   util::Utility::logInfo("Computed backbone of the formula with ", backbone.size(), " literals: ", ss.str());
+   solvers::clasp testSolver(std::chrono::seconds(5));
+   procedures::BackboneSimplification procedure(std::make_shared<solvers::clasp>(std::chrono::seconds(5)));
+
+   util::Utility::logOutput("Computing backbone of the formula");
+   procedure.apply(testCNF);
+
+   //util::Utility::logOutput("Computed backbone of the formula with ", testCNF.getClauses() - clauses, " literals");
+
+   std::string solutionFileName = "simplified.cnf";
+   util::Utility::logOutput("Writing result to \"", solutionFileName, "\"");
+   
+   testCNF.writeToFile(solutionFileName, true);
 
    util::Utility::cleanup();
 }

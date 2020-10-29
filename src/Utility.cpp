@@ -134,31 +134,9 @@ namespace preppy::util {
       exit(0);
    }
 
-   //system call using fork to be able to kill the command
    bool Utility::systemCall(const std::string& command) {
+      system(command.c_str());
       
-      int command_pid = fork();
-
-      if (command_pid < 0)
-      {
-         logError("Failed to fork");
-         return false;
-      }
-
-      if (command_pid == 0) 
-      {
-         //child
-         //execute command here
-         system(command.c_str());
-         exit(1);
-      }
-      else
-      {
-         //parent
-         int status;
-         wait(&status);
-      }
-
       return true;
    }
 

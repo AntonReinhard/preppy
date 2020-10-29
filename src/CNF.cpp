@@ -50,7 +50,7 @@ namespace preppy::cnf {
       bool sign = (literal > 0);
       literal = std::abs(literal);
       for (const auto& step : this->compressionInformation) {
-         if (literal == std::get<0>(step)) {
+         if (literal == static_cast<int>(std::get<0>(step))) {
             literal = std::get<1>(step);
          }
       }
@@ -74,7 +74,7 @@ namespace preppy::cnf {
       literal = std::abs(literal);
       
       for (auto step = this->compressionInformation.rbegin(); step != this->compressionInformation.rend(); ++step) {
-         if (literal == std::get<1>(*step)) {
+         if (literal == static_cast<int>(std::get<1>(*step))) {
             literal = std::get<0>(*step);
          }
       }
@@ -241,6 +241,10 @@ namespace preppy::cnf {
       }
 
       return this->maxVariable;
+   }
+
+   unsigned CNF::getClauses() const {
+      return this->size();
    }
 
    bool CNF::isCompressed() {

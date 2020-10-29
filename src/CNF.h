@@ -54,6 +54,9 @@ namespace preppy::cnf {
       // Returns the maximum variable number in the formula. Should usually be the same as getVariables but can differ in improperly saved cnf files
       unsigned getMaxVariable();
 
+      // Returns the number of clauses in the formula
+      unsigned getClauses() const;
+
       // Returns true if there are any variables that don't occur in the formula but are smaller than the biggest variable
       bool isCompressed();
 

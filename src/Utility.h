@@ -35,6 +35,21 @@ namespace preppy::util {
       // Deletes the Logger
       static void deleteLogger();
 
+      // For logging program output, will always be logged unless logging level = NOTHING
+      template<class... Ts>
+      static void logOutput(Ts const&... args) {
+         std:: ostringstream os;
+
+         using expander = int[];
+         (void) expander{0,
+            (void(os<<args), 0)...
+         };
+
+         if (nullptr != logger) {
+            logger->logOutput(os.str());
+         }
+      }
+
       // Log something to the global logger
       template<class... Ts>
       static void logDebug(Ts const&... args) {
@@ -45,7 +60,7 @@ namespace preppy::util {
             (void(os<<args), 0)...
          };
             
-         if (logger != nullptr) {
+         if (nullptr != logger) {
             logger->logDebug(os.str());
          }
       }
@@ -60,7 +75,7 @@ namespace preppy::util {
             (void(os<<args), 0)...
          };
             
-         if (logger != nullptr) {
+         if (nullptr != logger) {
             logger->logInfo(os.str());
          }
       }
@@ -75,7 +90,7 @@ namespace preppy::util {
             (void(os<<args), 0)...
          };
             
-         if (logger != nullptr) {
+         if (nullptr != logger) {
             logger->logWarning(os.str());
          }
       }
@@ -90,7 +105,7 @@ namespace preppy::util {
             (void(os<<args), 0)...
          };
             
-         if (logger != nullptr) {
+         if (nullptr != logger) {
             logger->logError(os.str());
          }
       }

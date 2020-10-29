@@ -31,10 +31,10 @@ namespace preppy::log {
 
         void logError(const std::string& message);
 
-    protected:
+        // Logging without a specific log level
+        void logOutput(const std::string& message);
 
-        // Only for stuff from the logger itself
-        void logLoggerInfo(const std::string& message);
+    protected:
 
         void log(const std::string& message, LOG_LEVEL logLevel);
 

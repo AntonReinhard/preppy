@@ -13,12 +13,13 @@ namespace preppy::log {
         : logLevel(logLevel) {
         this->start = util::clock::now();
         
-        this->logLoggerInfo("Logger created at " + util::Utility::getDateTime() + " with logging level \"" + logLevelToString(logLevel) + "\"");
+        this->logOutput("Logger created at " + util::Utility::getDateTime() + " with logging level \"" + logLevelToString(logLevel) + "\"");
 
         this->logLogo();
     }
 
     Logger::~Logger() {
+        this->logOutput("Execution finished");
     }
 
     void Logger::logLogo() {
@@ -29,7 +30,7 @@ namespace preppy::log {
         };
 
         for (const auto& line : logoLines) {
-            this->logLoggerInfo(line);
+            this->logOutput(line);
         }
     }
 
@@ -57,7 +58,7 @@ namespace preppy::log {
         this->log(message, LOG_LEVEL::ERROR);
     }
 
-    void Logger::logLoggerInfo(const std::string& message) {
+    void Logger::logOutput(const std::string& message) {
         if (logLevel == NOTHING) {
             return;
         }

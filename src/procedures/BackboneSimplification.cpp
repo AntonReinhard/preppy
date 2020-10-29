@@ -6,6 +6,7 @@
 #include "../Utility.h"
 
 #include <algorithm>
+#include <cmath>
 
 namespace preppy::procedures {
 
@@ -15,7 +16,31 @@ namespace preppy::procedures {
    }
 
    bool BackboneSimplification::apply(cnf::CNF& formula) {
-      //TODO
+      literals backbone = this->getBackbone(formula);
+
+      const uint64_t variablesWithoutBackbone = formula.getVariables() - backbone.size();
+      util::Utility::logInfo("Expected number of variables after removing backbone: ", variablesWithoutBackbone);
+
+      /*
+      for (const auto& lit : backbone) {
+         // Simply Adding the literals as known to the formula
+         cnf::Clause newClause;
+         newClause.push_back(lit);
+         formula.emplace_back(newClause);
+      }
+      */
+
+      BooleanConstraintPropagation bcp;
+      bcp.applyLiterals(formula, backbone);
+
+      //every non-backbone variable that disappears in this process can have any value -> halving number of possible models
+      util::Utility::logInfo("Actual number of variables after removing backbone:   ", formula.getVariables());
+
+      const uint64_t independentRemovedVariabels = variablesWithoutBackbone - formula.getVariables();
+
+      util::Utility::logInfo("That means a factor of ", std::pow(2, independentRemovedVariabels));
+
+      formula.compress();
 
       return true;
    }
@@ -74,9 +99,6 @@ namespace preppy::procedures {
             
             bcp.applySingleLiteral(workingFormula, currentLiteral);        // can propagate the literal we learned
             //workingFormula.setLiteralBackpropagated(currentLiteral);
-
-            //learnedClause.push_back(remainingLiterals[0]);
-            //workingFormula.push_back(learnedClause);              // we have learned this
 
             remainingLiterals.erase(remainingLiterals.begin());      // remove the literal that was tried
          }
