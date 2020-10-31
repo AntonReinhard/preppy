@@ -15,6 +15,13 @@ namespace preppy::cnf {
 
    }
 
+   CNF::CNF(std::initializer_list<cnf::Clause> l)
+      : std::vector<cnf::Clause>(l)
+      , variablesDirtyBit(true)
+      , maxVariableDirtyBit(true) {
+
+   }
+
    void CNF::compress() {
       util::Utility::logDebug("Compressing CNF by ", this->getMaxVariable() - this->getVariables(), " variables");
 
@@ -254,6 +261,17 @@ namespace preppy::cnf {
    void CNF::setDirtyBitsTrue() {
       this->maxVariableDirtyBit = true;
       this->variablesDirtyBit = true;
+   }
+
+   std::vector<unsigned> CNF::countVariables() {
+      std::vector<unsigned> varCount(this->getVariables());
+      for (const auto& clause : *this) {
+         for (const auto& literal : clause) {
+            varCount[std::abs(literal)]++;
+         }
+      }
+
+      return varCount;
    }
 
 }

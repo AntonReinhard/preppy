@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <initializer_list>
 
 namespace preppy::cnf {
 
@@ -15,8 +16,11 @@ namespace preppy::cnf {
       // Construct empty Clause
       Clause() = default;
 
+      // Constructs clause with given literals
+      explicit Clause(std::initializer_list<int> l);
+
       // Construct this Clause from a line in a cnf file
-      Clause(const std::string& line);
+      explicit Clause(const std::string& line);
 
       // Sets the given literal to true, if the clause becomes satisfied through this it will be empty
       // Returns true if the clause is satisfied afterwards

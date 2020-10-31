@@ -4,9 +4,14 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <initializer_list>
 #include <algorithm>
 
 namespace preppy::cnf {
+
+   Clause::Clause(std::initializer_list<int> l) 
+      : std::vector<int>(l) {
+   }
 
    Clause::Clause(const std::string& line) {
       std::istringstream ss(line);

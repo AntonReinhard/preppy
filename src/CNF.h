@@ -3,6 +3,7 @@
 #include "Model.h"
 
 #include <vector>
+#include <initializer_list>
 #include <tuple>
 
 namespace preppy::cnf {
@@ -16,6 +17,9 @@ namespace preppy::cnf {
 
       // Creates empty CNF
       CNF();
+
+      // Creates a CNF with given initializer list of Clauses
+      CNF(std::initializer_list<cnf::Clause> l);
 
       // Compresses this formula
       void compress();
@@ -62,6 +66,9 @@ namespace preppy::cnf {
 
       // when changing the formula from the outside, call this to set the dirty bits to true again
       void setDirtyBitsTrue();
+
+      // Counts how often a variable appears in the formula and returns a vector, where the nth place is how often n appears
+      std::vector<unsigned> countVariables();
 
    protected:
 
