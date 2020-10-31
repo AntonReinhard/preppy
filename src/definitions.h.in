@@ -2,11 +2,17 @@
 
 #include <chrono>
 #include <string>
+#include <vector>
 
 namespace preppy::util {
     typedef std::chrono::steady_clock clock;
 
     const std::string VERSION = "${PREPPY_VERSION}";
+}
+
+namespace preppy::cnf {
+    typedef std::vector<int> Literals;
+    typedef std::vector<unsigned> Variables;
 }
 
 namespace preppy::log {
