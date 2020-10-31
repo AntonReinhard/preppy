@@ -2,14 +2,12 @@
 
 #include "Procedures.h"
 #include "../solvers/Solver.h"
+#include "../definitions.h"
 
 #include <set>
 #include <memory>
 
 namespace preppy::procedures {
-
-   // A ordered set of literals for quick lookup
-   typedef std::vector<int> literals;
 
    class BackboneSimplification
       : public Procedure {
@@ -20,7 +18,7 @@ namespace preppy::procedures {
       bool apply(cnf::CNF& formula) override;
 
       // computes the backbone of the given formula
-      literals getBackbone(cnf::CNF& formula);
+      cnf::Literals getBackbone(const cnf::CNF& formula) const;
 
    protected:
 

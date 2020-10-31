@@ -23,9 +23,20 @@ namespace preppy::procedures {
       formula.setDirtyBitsTrue();
    }
 
+   void BooleanConstraintPropagation::applySingleLiteralEq(cnf::CNF& formula, const int literal) {
+      this->applySingleLiteral(formula, literal);
+      formula.push_back(cnf::Clause{literal});
+   }
+
    void BooleanConstraintPropagation::applyLiterals(cnf::CNF& formula, const literals& literals) {
       for (const auto& literal : literals) {
          this->applySingleLiteral(formula, literal);
+      }
+   }
+
+   void BooleanConstraintPropagation::applyLiteralsEq(cnf::CNF& formula, const literals& literals) {
+      for (const auto& literal : literals) {
+         this->applySingleLiteralEq(formula, literal);
       }
    }
 

@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}
    solvers/clasp.cpp
    procedures/BackboneSimplification.cpp
    procedures/BooleanConstraintPropagation.cpp
+   procedures/BipartitionAndElimination.cpp
 )
 
 target_compile_options(${PROJECT_NAME}
