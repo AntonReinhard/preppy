@@ -24,30 +24,16 @@ namespace preppy::solvers {
 
       util::Utility::logDebug("Executing \"", command, "\"");
 
-      if (!util::Utility::systemCall(command)) {
-         util::Utility::logError("Couldn't execute solver ", this->getName(), ", exiting");
+      solution = util::Utility::systemCall(command);
+
+      if (solution.empty()) {
+         util::Utility::logError("Couldn't read solution from solver \"", this->getName(), "\"");
          return false;
       }
-
-      // Read solution
-      std::ifstream solutionFile(this->outFileName);
-      if (!solutionFile.is_open()) {
-         util::Utility::logError("Couldn't open cnf solution file ", this->outFileName);
-         return false;
-      }
-
-      std::stringstream solutionSS;
-      solutionSS << solutionFile.rdbuf();
-      solution = solutionSS.str();
-
-      solutionFile.close();
 
       // Remove left-over files
       if (remove(this->inFileName.c_str())) {
          util::Utility::logInfo("Couldn't delete cnf file \"", this->inFileName, "\"");
-      }
-      if (remove(this->outFileName.c_str())) {
-         util::Utility::logInfo("Couldn't delete solutions file\"", this->outFileName, "\"");
       }
 
       return true;

@@ -29,8 +29,6 @@ namespace preppy::solvers {
 
       const std::string inFileName = "in.cnf";
 
-      const std::string outFileName = "out.sol";
-
    private:
 
       std::string solvername;

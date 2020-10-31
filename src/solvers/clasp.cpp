@@ -20,8 +20,7 @@ namespace preppy::solvers {
       syscall << this->getName()
          << " 1 -q" // only search for one model -> SAT test, and quiet option cause we don't need the model itself
          << " --time-limit=" << std::chrono::duration_cast<std::chrono::seconds>(this->timeout).count()
-         << " " << this->inFileName
-         << " > " << this->outFileName << " 2>&1"; // redirect both stdout and stderr into outFile
+         << " " << this->inFileName << " 2>&1"; // redirect stderr to stdout
 
       // Execute Solver      
       std::string solutionString;
@@ -55,8 +54,7 @@ namespace preppy::solvers {
       syscall << this->getName()
          << " 1"                                   // search for any one model and output it
          << " --time-limit=0"                      // no timeout, we need to find a model
-         << " " << this->inFileName
-         << " > " << this->outFileName << " 2>&1"; // redirect both stdout and stderr into outFile
+         << " " << this->inFileName << " 2>&1";    // redirect stderr to stdout
 
       // Execute Solver
       std::string solutionString;

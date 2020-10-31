@@ -1,5 +1,6 @@
 #include "Utility.h"
 #include "definitions.h"
+#include "solvers/clasp.h"
 
 #include <sys/stat.h>
 #include <unistd.h>
@@ -19,6 +20,9 @@ namespace preppy::util {
 
    std::unique_ptr<log::Logger> Utility::logger = nullptr;
 
+   std::shared_ptr<solvers::Solver> Utility::solver = nullptr;
+   clock::duration Utility::solvingTimeout = std::chrono::seconds(5);
+
    log::LOG_LEVEL Utility::GLOBAL_LOG_LEVEL = log::WARNING;
 
    std::map<std::string, util::clock::time_point> Utility::timerStartPoints;
@@ -27,6 +31,8 @@ namespace preppy::util {
       // always initialize the logger first
       Utility::initializeLogger(Utility::GLOBAL_LOG_LEVEL);
       Utility::initializeSignalHandling();
+
+      Utility::solver = std::make_shared<solvers::clasp>(solvingTimeout);
 
       return true;
    }
@@ -134,10 +140,18 @@ namespace preppy::util {
       exit(0);
    }
 
-   bool Utility::systemCall(const std::string& command) {
-      system(command.c_str());
-      
-      return true;
+   std::string Utility::systemCall(const std::string& command) {    
+      std::array<char, 128> buffer;
+      std::string result;
+      std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
+      if (!pipe) {
+         Utility::logError("System call \"", command, "\" failed");
+         return std::string();
+      }
+      while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+         result += buffer.data();
+      }
+      return result;
    }
 
    std::vector<std::string> Utility::tokenizeString(const std::string& str, const std::string& delim) {
@@ -206,6 +220,28 @@ namespace preppy::util {
       }
 
       return ss.str();
+   }
+
+   std::shared_ptr<solvers::Solver> Utility::getSolver() {
+      return Utility::solver;
+   }
+
+   cnf::Variables Utility::literalsToVariables(const cnf::Literals& literals) {
+      cnf::Variables vars;
+      for (const auto& lit : literals) {
+         vars.push_back(std::abs(lit));
+      }
+      return vars;
+   }
+
+   void Utility::setSolver(const std::string& solverName) {
+      if ("clasp" == solverName) {
+         Utility::logDebug("Using solver \"", solverName, "\"");
+         Utility::solver.reset(new solvers::clasp(solvingTimeout));
+      }
+      else {
+         Utility::logError("Can't set unknown solver \"", solverName, "\"");
+      }
    }
 
 }

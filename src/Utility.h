@@ -1,6 +1,7 @@
 #pragma once
 #include "Logger.h"
 #include "definitions.h"
+#include "solvers/Solver.h"
 
 #include <string>
 #include <sstream>
@@ -117,8 +118,8 @@ namespace preppy::util {
 
       static void SignalHandler(int signal);
 
-      // Executes the given command. Returns true on successfull execution
-      static bool systemCall(const std::string& command);
+      // Executes the given command. Returns stdout output on successfull execution
+      static std::string systemCall(const std::string& command);
 
       static std::vector<std::string> tokenizeString(const std::string& str, const std::string& delim);
 
@@ -131,11 +132,23 @@ namespace preppy::util {
       // Converts a chrono::duration to a readable string
       static std::string durationToString(const util::clock::duration& duration);
 
+      // Gets currently used solver
+      static std::shared_ptr<solvers::Solver> getSolver();
+
+      // Converts a vector of literals to a vector of variables
+      static cnf::Variables literalsToVariables(const cnf::Literals& literals);
+
    protected:
+
+      // Sets the given solver as the main solver
+      static void setSolver(const std::string& solverName);
 
    private:
 
       static std::unique_ptr<log::Logger> logger;
+
+      static std::shared_ptr<solvers::Solver> solver;
+      static clock::duration solvingTimeout;
 
       static log::LOG_LEVEL GLOBAL_LOG_LEVEL;
 
