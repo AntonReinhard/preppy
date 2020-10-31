@@ -44,9 +44,7 @@ namespace preppy::cnf {
          // if this variable is missing -> compress
          if (variables.find(i) == variables.end()) {
             variables.erase(maxVar);
-            for (auto& clause : *this) {
-               clause.renameVariable(maxVar, i);
-            }
+            this->renameVariable(maxVar, i);
             this->compressionInformation.emplace_back(maxVar, i, false);
          }
       }
@@ -94,6 +92,21 @@ namespace preppy::cnf {
       for (auto step : this->compressionInformation) {
          model.insert(model.begin() + std::get<1>(step), std::get<2>(step));
       }
+   }
+
+   void CNF::renameVariable(const unsigned variable, const unsigned newName) {
+      for (auto& clause : *this) {
+         clause.renameVariable(variable, newName);
+      }
+      this->maxVariableDirtyBit = true;
+   }
+
+   void CNF::joinFormula(const cnf::CNF& formula) {
+      for (const auto& clause : formula) {
+         this->push_back(clause);
+      }
+      this->maxVariableDirtyBit = true;
+      this->variablesDirtyBit = true;
    }
 
    void CNF::setLiteralBackpropagated(int literal) {

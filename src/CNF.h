@@ -39,6 +39,12 @@ namespace preppy::cnf {
       // Decompresses a model from this version of the formula to the original
       void decompress(cnf::Model& model);
 
+      // Renames the given variable to the new name, does not check if the new name was already used
+      void renameVariable(const unsigned variable, const unsigned newName);
+
+      // Joins a second formula to this one, adding all clauses
+      void joinFormula(const cnf::CNF& formula);
+
       // To call when a literal was backpropagated and is now not part of the formula anymore, so it can be compressed again
       void setLiteralBackpropagated(int literal);
 
