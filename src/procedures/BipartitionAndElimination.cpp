@@ -26,6 +26,40 @@ namespace preppy::procedures {
       bcp.applyLiteralsEq(workingFormula, backbone);
       
       cnf::Variables outputVariables = util::Utility::literalsToVariables(backbone);
+      cnf::Variables inputVariables{};
+
+      cnf::Variables appearances = workingFormula.countVariables();
+      std::vector<std::pair<unsigned, unsigned>> sortedAppearances;     // first = variable, second = number of appearances
+
+      for (size_t i = 1; i < appearances.size(); ++i) {
+         sortedAppearances.emplace_back(i, appearances[i]);
+      }
+
+      std::sort(
+         sortedAppearances.begin(), 
+         sortedAppearances.end(), 
+         [](std::pair<unsigned, unsigned> a, std::pair<unsigned, unsigned> b){
+            return a.second < b.second;
+         }
+      );
+
+      util::Utility::logDebug("Sorted");
+
+      for (size_t i = 0; i < sortedAppearances.size(); ++i) {
+         cnf::Variables definitionSet = inputVariables;
+         for (size_t j = i; j < sortedAppearances.size(); ++j) {
+            definitionSet.push_back(sortedAppearances[j].first);
+         }
+         
+         bool isDefined = this->isDefined(sortedAppearances[i].first, workingFormula, definitionSet);
+
+         if (isDefined) {
+            outputVariables.push_back(sortedAppearances[i].first);
+         }
+         else {
+            inputVariables.push_back(sortedAppearances[i].first);
+         }
+      }
 
       return outputVariables;
    }
@@ -34,8 +68,10 @@ namespace preppy::procedures {
 
    }
 
-   bool BipartitionAndElimination::isDefined(const unsigned x, const cnf::CNF& formula, const cnf::Variables& variables, unsigned maxC) {
+   bool BipartitionAndElimination::isDefined(const unsigned x, const cnf::CNF& formula, const cnf::Variables& variables/*, unsigned maxC*/) const {
       // generate formula to check for satisfiability
+
+      util::Utility::logDebug("Checking definedness of ", x);
 
       // We need two copies to work on
       cnf::CNF workingFormula = formula;
@@ -43,6 +79,7 @@ namespace preppy::procedures {
 
       unsigned xPrime = 0;
 
+      util::Utility::logDebug("Renaming variables");
       // rename every variable *not* in variables to an unassigned variable name in copyFormula
       unsigned newVariableName = copyFormula.getMaxVariable() + 1;
       for (unsigned var = 1; var < workingFormula.getMaxVariable(); ++var) {
@@ -56,6 +93,7 @@ namespace preppy::procedures {
          ++newVariableName;
       }
 
+      util::Utility::logDebug("Joining Formulas");
       // add clauses from the copy to working Formula
       workingFormula.joinFormula(copyFormula);
 

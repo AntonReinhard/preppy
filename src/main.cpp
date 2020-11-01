@@ -3,6 +3,7 @@
 #include "Utility.h"
 #include "solvers/clasp.h"
 #include "procedures/BackboneSimplification.h"
+#include "procedures/BipartitionAndElimination.h"
 
 #include <string>
 
@@ -37,18 +38,29 @@ int main(const int argc, char** argv) {
       util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) after compression");
    }
 
-   solvers::clasp testSolver(std::chrono::seconds(5));
-   procedures::BackboneSimplification procedure(std::make_shared<solvers::clasp>(std::chrono::seconds(5)));
+/*
+   procedures::BackboneSimplification procedure(util::Utility::getSolver());
 
    util::Utility::logOutput("Computing backbone of the formula");
    procedure.apply(testCNF);
+*/
 
-   //util::Utility::logOutput("Computed backbone of the formula with ", testCNF.getClauses() - clauses, " literals");
+   procedures::BipartitionAndElimination procedure;
 
+   util::Utility::logOutput("Computing Bipartition of the formula");
+   cnf::Variables outputVariables = procedure.bipartition(testCNF);
+
+   std::stringstream ss;
+   for (const auto& var : outputVariables) {
+      ss << var << " ";
+   }
+   util::Utility::logOutput("Output Variables: ", ss.str());
+
+/*
    std::string solutionFileName = "simplified.cnf";
    util::Utility::logOutput("Writing result to \"", solutionFileName, "\"");
    
    testCNF.writeToFile(solutionFileName, true);
-
+*/
    util::Utility::cleanup();
 }
