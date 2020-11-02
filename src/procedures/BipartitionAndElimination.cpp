@@ -72,6 +72,10 @@ namespace preppy::procedures {
       // generate formula to check for satisfiability
 
       util::Utility::logDebug("Checking definedness of ", x);
+      
+      if (std::find(variables.begin(), variables.end(), x) != variables.end()) {     // if x is in the variables then it is defined
+         return true;
+      }
 
       // We need two copies to work on
       cnf::CNF workingFormula = formula;
