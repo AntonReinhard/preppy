@@ -6,6 +6,7 @@
 #include "procedures/BipartitionAndElimination.h"
 
 #include <string>
+#include <algorithm>
 
 using namespace preppy;
 
@@ -38,17 +39,12 @@ int main(const int argc, char** argv) {
       util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) after compression");
    }
 
-/*
-   procedures::BackboneSimplification procedure(util::Utility::getSolver());
-
-   util::Utility::logOutput("Computing backbone of the formula");
-   procedure.apply(testCNF);
-*/
-
    procedures::BipartitionAndElimination procedure;
 
    util::Utility::logOutput("Computing Bipartition of the formula");
    cnf::Variables outputVariables = procedure.bipartition(testCNF);
+   
+   std::sort(outputVariables.begin(), outputVariables.end());
 
    std::stringstream ss;
    for (const auto& var : outputVariables) {
@@ -62,5 +58,6 @@ int main(const int argc, char** argv) {
    
    testCNF.writeToFile(solutionFileName, true);
 */
+
    util::Utility::cleanup();
 }

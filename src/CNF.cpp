@@ -277,7 +277,7 @@ namespace preppy::cnf {
    }
 
    std::vector<unsigned> CNF::countVariables() {
-      std::vector<unsigned> varCount(this->getVariables());
+      std::vector<unsigned> varCount(this->getMaxVariable() + 1);
       for (const auto& clause : *this) {
          for (const auto& literal : clause) {
             varCount[std::abs(literal)]++;
