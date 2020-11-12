@@ -15,8 +15,8 @@ namespace preppy::cnf {
 
    }
 
-   CNF::CNF(std::initializer_list<cnf::Clause> l)
-      : std::vector<cnf::Clause>(l)
+   CNF::CNF(std::initializer_list<Clauses::value_type> l)
+      : clauses(l)
       , variablesDirtyBit(true)
       , maxVariableDirtyBit(true) {
 
@@ -285,6 +285,118 @@ namespace preppy::cnf {
       }
 
       return varCount;
+   }
+
+   Clauses::iterator CNF::begin() noexcept {
+      return this->clauses.begin();
+   }
+
+   Clauses::const_iterator CNF::begin() const noexcept {
+      return this->clauses.begin();
+   }
+
+   Clauses::iterator CNF::end() noexcept {
+      return this->clauses.end();
+   }
+
+   Clauses::const_iterator CNF::end() const noexcept {
+      return this->clauses.end();
+   }
+   
+   Clauses::reference CNF::front() {
+      return this->clauses.front();
+   }
+
+   Clauses::const_reference CNF::front() const {
+      return this->clauses.front();
+   }
+
+   Clauses::reference CNF::back() {
+      return this->clauses.back();
+   }
+   
+   Clauses::const_reference CNF::back() const {
+      return this->clauses.back();
+   }
+   
+   Clauses::reference CNF::operator[](Clauses::size_type n) {
+      return this->clauses[n];
+   }
+
+   Clauses::const_reference CNF::operator[](Clauses::size_type n) const {
+      return this->clauses[n];
+   }
+   
+   Clauses::reference CNF::at(const Clauses::size_type n) {
+      return this->clauses.at(n);
+   }
+
+   Clauses::const_reference CNF::at(const Clauses::size_type n) const {
+      return this->clauses.at(n);
+   }
+
+   void CNF::push_back(const Clauses::value_type& val) {
+      this->clauses.push_back(val);
+   }
+
+   void CNF::push_back(Clauses::value_type&& val) {
+      this->clauses.push_back(val);
+   }
+
+   void CNF::pop_back() {
+      this->clauses.pop_back();
+   }
+
+   Clauses::iterator CNF::erase(Clauses::const_iterator position) {
+      return this->clauses.erase(position);
+   }
+
+   Clauses::iterator CNF::erase(Clauses::const_iterator first, Clauses::const_iterator last) {
+      return this->clauses.erase(first, last);
+   }
+
+   Clauses::iterator CNF::insert(Clauses::const_iterator position, const Clauses::value_type& val) {
+      return this->clauses.insert(position, val);
+   }
+
+   Clauses::iterator CNF::insert(Clauses::const_iterator position, Clauses::size_type n, const Clauses::value_type& val) {
+      return this->clauses.insert(position, n, val);
+   }
+
+   Clauses::iterator CNF::insert(Clauses::const_iterator position, Clauses::value_type&& val) {
+      return this->clauses.insert(position, val);
+   }
+
+   Clauses::iterator CNF::insert(Clauses::const_iterator position, std::initializer_list<Clauses::value_type> il) {
+      return this->clauses.insert(position, il);
+   }
+
+   void CNF::clear() noexcept {
+      this->clauses.clear();
+   }
+
+   void CNF::reserve(Clauses::size_type n) {
+      this->clauses.reserve(n);
+   }
+
+   Clauses::size_type CNF::capacity() const noexcept {
+      return this->clauses.capacity();
+   }
+
+   void CNF::resize(Clauses::size_type n) {
+      this->clauses.resize(n);
+   }
+
+   void CNF::resize(Clauses::size_type n, const Clauses::value_type& val) {
+      this->clauses.resize(n, val);
+   }
+
+   Clauses::size_type CNF::size() const noexcept {
+      return this->clauses.size();
+   }
+
+   Clauses::size_type CNF::max_size() const noexcept {
+      return this->clauses.max_size();
    }
 
 }

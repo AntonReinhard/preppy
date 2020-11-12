@@ -1,6 +1,7 @@
 #pragma once
 #include "Clause.h"
 #include "Model.h"
+#include "definitions.h"
 
 #include <vector>
 #include <initializer_list>
@@ -11,15 +12,14 @@ namespace preppy::cnf {
    /*
     * Represents a CNF Formula. Derived from a vector of Clauses
     */
-   class CNF 
-      : public std::vector<cnf::Clause> {
+   class CNF {
    public:
 
       // Creates empty CNF
       CNF();
 
       // Creates a CNF with given initializer list of Clauses
-      CNF(std::initializer_list<cnf::Clause> l);
+      CNF(std::initializer_list<Clauses::value_type> l);
 
       // Compresses this formula
       void compress();
@@ -76,10 +76,61 @@ namespace preppy::cnf {
       // Counts how often a variable appears in the formula and returns a vector, where the nth place is how often n appears
       std::vector<unsigned> countVariables();
 
+
+      // exposing vector member functions for clauses
+      // access
+      Clauses::iterator begin() noexcept;
+      Clauses::const_iterator begin() const noexcept;
+      Clauses::iterator end() noexcept;
+      Clauses::const_iterator end() const noexcept;
+      Clauses::reference front();
+      Clauses::const_reference front() const;
+      Clauses::reference back();
+      Clauses::const_reference back() const;
+      Clauses::reference operator[](Clauses::size_type n);
+      Clauses::const_reference operator[](Clauses::size_type n) const;
+      Clauses::reference at(const Clauses::size_type n);
+      Clauses::const_reference at(const Clauses::size_type n) const;
+
+      // muting
+      void push_back(const Clauses::value_type& val);
+      void push_back(Clauses::value_type&& val);
+      template <class... Args>
+      Clauses::iterator emplace(Clauses::const_iterator position, Args&&... args) {
+         return this->clauses.emplace(position, args...);
+      }
+      template <class... Args>
+      void emplace_back(Args&&... args) {
+         this->clauses.emplace_back(args...);
+      }
+      void pop_back();
+      Clauses::iterator erase(Clauses::const_iterator position);
+      Clauses::iterator erase(Clauses::const_iterator first, Clauses::const_iterator last);
+      Clauses::iterator insert(Clauses::const_iterator position, const Clauses::value_type& val);
+      Clauses::iterator insert(Clauses::const_iterator position, Clauses::size_type n, const Clauses::value_type& val);
+      template <class InputIterator>
+      Clauses::iterator insert(Clauses::const_iterator position, InputIterator first, InputIterator last) {
+         return this->clauses.insert(position, first, last);
+      }
+      Clauses::iterator insert(Clauses::const_iterator position, Clauses::value_type&& val);
+      Clauses::iterator insert(Clauses::const_iterator position, std::initializer_list<Clauses::value_type> il);
+      void clear() noexcept;
+
+      // size
+      void reserve(Clauses::size_type n);
+      Clauses::size_type capacity() const noexcept;
+      void resize(Clauses::size_type n);
+      void resize(Clauses::size_type n, const Clauses::value_type& val);
+      Clauses::size_type size() const noexcept;
+      Clauses::size_type max_size() const noexcept;
+
    protected:
 
 
    private:
+
+      // the clauses in this formula
+      Clauses clauses;
 
       // name of the formula, currently the file path it was read from
       std::string name;

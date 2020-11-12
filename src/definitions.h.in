@@ -13,6 +13,8 @@ namespace preppy::util {
 namespace preppy::cnf {
     typedef std::vector<int> Literals;
     typedef std::vector<unsigned> Variables;
+    class Clause;
+    typedef std::vector<cnf::Clause> Clauses;
 }
 
 namespace preppy::log {

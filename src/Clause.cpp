@@ -1,5 +1,6 @@
 #include "Clause.h"
 #include "Utility.h"
+#include "definitions.h"
 
 #include <string>
 #include <sstream>
@@ -9,8 +10,8 @@
 
 namespace preppy::cnf {
 
-   Clause::Clause(std::initializer_list<int> l) 
-      : std::vector<int>(l) {
+   Clause::Clause(std::initializer_list<preppy::cnf::Literals::value_type> l) 
+      : literals(l) {
    }
 
    Clause::Clause(const std::string& line) {
@@ -84,6 +85,118 @@ namespace preppy::cnf {
          }
       }
       return max;
+   }
+
+   Literals::iterator Clause::begin() noexcept {
+      return this->literals.begin();
+   }
+
+   Literals::const_iterator Clause::begin() const noexcept {
+      return this->literals.begin();
+   }
+
+   Literals::iterator Clause::end() noexcept {
+      return this->literals.end();
+   }
+
+   Literals::const_iterator Clause::end() const noexcept {
+      return this->literals.end();
+   }
+   
+   Literals::reference Clause::front() {
+      return this->literals.front();
+   }
+
+   Literals::const_reference Clause::front() const {
+      return this->literals.front();
+   }
+
+   Literals::reference Clause::back() {
+      return this->literals.back();
+   }
+   
+   Literals::const_reference Clause::back() const {
+      return this->literals.back();
+   }
+   
+   Literals::reference Clause::operator[](Literals::size_type n) {
+      return this->literals[n];
+   }
+
+   Literals::const_reference Clause::operator[](Literals::size_type n) const {
+      return this->literals[n];
+   }
+   
+   Literals::reference Clause::at(const Literals::size_type n) {
+      return this->literals.at(n);
+   }
+
+   Literals::const_reference Clause::at(const Literals::size_type n) const {
+      return this->literals.at(n);
+   }
+
+   void Clause::push_back(const Literals::value_type& val) {
+      this->literals.push_back(val);
+   }
+
+   void Clause::push_back(Literals::value_type&& val) {
+      this->literals.push_back(val);
+   }
+
+   void Clause::pop_back() {
+      this->literals.pop_back();
+   }
+
+   Literals::iterator Clause::erase(Literals::const_iterator position) {
+      return this->literals.erase(position);
+   }
+
+   Literals::iterator Clause::erase(Literals::const_iterator first, Literals::const_iterator last) {
+      return this->literals.erase(first, last);
+   }
+
+   Literals::iterator Clause::insert(Literals::const_iterator position, const Literals::value_type& val) {
+      return this->literals.insert(position, val);
+   }
+
+   Literals::iterator Clause::insert(Literals::const_iterator position, Literals::size_type n, const Literals::value_type& val) {
+      return this->literals.insert(position, n, val);
+   }
+
+   Literals::iterator Clause::insert(Literals::const_iterator position, Literals::value_type&& val) {
+      return this->literals.insert(position, val);
+   }
+
+   Literals::iterator Clause::insert(Literals::const_iterator position, std::initializer_list<Literals::value_type> il) {
+      return this->literals.insert(position, il);
+   }
+
+   void Clause::clear() noexcept {
+      this->literals.clear();
+   }
+
+   void Clause::reserve(Literals::size_type n) {
+      this->literals.reserve(n);
+   }
+
+   Literals::size_type Clause::capacity() const noexcept {
+      return this->literals.capacity();
+   }
+
+   void Clause::resize(Literals::size_type n) {
+      this->literals.resize(n);
+   }
+
+   void Clause::resize(Literals::size_type n, const Literals::value_type& val) {
+      this->literals.resize(n, val);
+   }
+
+   Literals::size_type Clause::size() const noexcept {
+      return this->literals.size();
+   }
+
+   Literals::size_type Clause::max_size() const noexcept {
+      return this->literals.max_size();
    }
 
 }
