@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
    procedures/BackboneSimplification.cpp
    procedures/BooleanConstraintPropagation.cpp
    procedures/BipartitionAndElimination.cpp
+   procedures/Vivification.cpp
 )
 
 target_compile_options(${PROJECT_NAME}

@@ -49,8 +49,8 @@ namespace preppy::procedures {
       }
 
       std::sort(
-         sortedAppearances.begin(), 
-         sortedAppearances.end(), 
+         sortedAppearances.begin(),
+         sortedAppearances.end(),
          [](std::pair<unsigned, unsigned> a, std::pair<unsigned, unsigned> b){
             return a.second < b.second;
          }
@@ -119,5 +119,4 @@ namespace preppy::procedures {
 
       return !util::Utility::getSolver()->isSatisfiable(workingFormula);
    }
-
 }
