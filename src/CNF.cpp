@@ -99,6 +99,7 @@ namespace preppy::cnf {
          clause.renameVariable(variable, newName);
       }
       this->maxVariableDirtyBit = true;
+      this->variablesDirtyBit = true;
    }
 
    void CNF::joinFormula(const cnf::CNF& formula) {

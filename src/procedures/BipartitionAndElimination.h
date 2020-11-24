@@ -13,7 +13,7 @@ namespace preppy::procedures {
       : public Procedure {
    public:
 
-      BipartitionAndElimination() = default;
+      BipartitionAndElimination();
 
       bool apply(cnf::CNF& formula) override;
 

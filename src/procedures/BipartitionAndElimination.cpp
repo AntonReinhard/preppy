@@ -8,6 +8,10 @@
 
 namespace preppy::procedures {
 
+   BipartitionAndElimination::BipartitionAndElimination() {
+      util::Utility::logOutput("Created Bipartition and Elimination procedure");
+   }
+
    bool BipartitionAndElimination::apply(cnf::CNF& formula) {
       cnf::Variables outputVariables = this->bipartition(formula);
 
@@ -25,14 +29,23 @@ namespace preppy::procedures {
       cnf::Literals backbone = bs.getBackbone(workingFormula);
       bcp.applyLiteralsEq(workingFormula, backbone);
       
+      cnf::Variables backboneVariables;
+      for (const auto& l : backbone) {
+         backboneVariables.push_back(std::abs(l));
+      }
+      
       cnf::Variables outputVariables = util::Utility::literalsToVariables(backbone);
-      cnf::Variables inputVariables{};
+      cnf::Variables inputVariables;
 
       cnf::Variables appearances = workingFormula.countVariables();
       std::vector<std::pair<unsigned, unsigned>> sortedAppearances;     // first = variable, second = number of appearances
 
       for (size_t i = 1; i < appearances.size(); ++i) {
-         sortedAppearances.emplace_back(i, appearances[i]);
+         //if it's in the backbone we don't need to add
+         //so it's only added if it's not in the backbone
+         if (std::find(backboneVariables.begin(), backboneVariables.end(), i) == backboneVariables.end()) { 
+            sortedAppearances.emplace_back(i, appearances[i]);
+         }
       }
 
       std::sort(
@@ -47,7 +60,7 @@ namespace preppy::procedures {
 
       for (size_t i = 0; i < sortedAppearances.size(); ++i) {
          cnf::Variables definitionSet = inputVariables;
-         for (size_t j = i; j < sortedAppearances.size(); ++j) {
+         for (size_t j = i+1; j < sortedAppearances.size(); ++j) {
             definitionSet.push_back(sortedAppearances[j].first);
          }
          
@@ -86,12 +99,12 @@ namespace preppy::procedures {
       util::Utility::logDebug("Renaming variables");
       // rename every variable *not* in variables to an unassigned variable name in copyFormula
       unsigned newVariableName = copyFormula.getMaxVariable() + 1;
-      for (unsigned var = 1; var < workingFormula.getMaxVariable(); ++var) {
+      for (unsigned var = 1; var <= workingFormula.getMaxVariable(); ++var) {
          if (std::find(variables.begin(), variables.end(), var) != variables.end()) {     // don't rename if it's found
             continue;
          }
          if (x == var) {   // remember what x is renamed to
-            xPrime = var;
+            xPrime = newVariableName;
          }
          copyFormula.renameVariable(var, newVariableName);
          ++newVariableName;
