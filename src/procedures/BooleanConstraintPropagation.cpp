@@ -28,7 +28,8 @@ namespace preppy::procedures {
             continue;
          }
          if (clause.size() == 0) {
-            continue;
+            // unsatisfiable
+            return {0};
          }
 
          //if there's at least 2 literals, add the first two literals of the clause to the watched literals
@@ -51,10 +52,14 @@ namespace preppy::procedures {
             // check if we produced a unit clause
             cnf::Clause partialClause = clause->getPartialClause(units);
             if (partialClause.size() == 0) {
-               // clause is empty -> clause is satisfied
-               continue;
+               // clause is empty -> clause is unsatisfied
+               return {0};
             }
             if (partialClause.size() == 1) {
+               // check if the clause was satisfied
+               if (partialClause[0] == 0) {
+                  continue;   // clause was satisfied, continue
+               }
                // new unit clause -> add to units
                // do nothing else since if we come across the same clause again it will be satisfied and not get here
                units.push_back(partialClause[0]);
@@ -90,13 +95,13 @@ namespace preppy::procedures {
       formula.push_back(cnf::Clause{literal});
    }
 
-   void BooleanConstraintPropagation::applyLiterals(cnf::CNF& formula, const literals& literals) const {
+   void BooleanConstraintPropagation::applyLiterals(cnf::CNF& formula, const cnf::Literals& literals) const {
       for (const auto& literal : literals) {
          this->applySingleLiteral(formula, literal);
       }
    }
 
-   void BooleanConstraintPropagation::applyLiteralsEq(cnf::CNF& formula, const literals& literals) const {
+   void BooleanConstraintPropagation::applyLiteralsEq(cnf::CNF& formula, const cnf::Literals& literals) const {
       for (const auto& literal : literals) {
          this->applySingleLiteralEq(formula, literal);
       }

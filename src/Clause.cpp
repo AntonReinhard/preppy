@@ -51,7 +51,7 @@ namespace preppy::cnf {
       cnf::Clause result(*this);
       for (const auto& lit : literals) {
          if (result.setLiteral(lit)) {
-            return {};
+            return {0};
          }
       }
       return result;

@@ -13,6 +13,7 @@ namespace preppy::procedures {
       bool apply(cnf::CNF& formula) override;
 
       // Returns all literals that can be derived from the formula using boolean constraint propagation
+      // If the formula is detected to be unsatisfiable in this process {0} is returned
       cnf::Literals getBcp(cnf::CNF& formula) const;
 
       // Applies boolean constraint propagation on the formula with the single literal

@@ -4,6 +4,7 @@
 #include "solvers/clasp.h"
 #include "procedures/BackboneSimplification.h"
 #include "procedures/BipartitionAndElimination.h"
+#include "procedures/BooleanConstraintPropagation.h"
 
 #include <string>
 #include <algorithm>
@@ -39,25 +40,17 @@ int main(const int argc, char** argv) {
       util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) after compression");
    }
 
-   procedures::BipartitionAndElimination procedure;
-
-   util::Utility::logOutput("Computing Bipartition of the formula");
-   cnf::Variables outputVariables = procedure.bipartition(testCNF);
-   
-   std::sort(outputVariables.begin(), outputVariables.end());
-
+   procedures::BooleanConstraintPropagation procedure;
+   auto outputVariables = procedure.getBcp(testCNF);
    std::stringstream ss;
    for (const auto& var : outputVariables) {
       ss << var << " ";
    }
-   util::Utility::logOutput("Output Variables: ", ss.str());
+   util::Utility::logOutput("Unit propagated Literals: ", ss.str());
 
-/*
-   std::string solutionFileName = "simplified.cnf";
-   util::Utility::logOutput("Writing result to \"", solutionFileName, "\"");
-   
-   testCNF.writeToFile(solutionFileName, true);
-*/
+   procedure.apply(testCNF);
+
+   util::Utility::logOutput("Formula: ", testCNF.toString());
 
    util::Utility::cleanup();
 }

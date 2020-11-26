@@ -28,6 +28,7 @@ namespace preppy::cnf {
       bool setLiteral(const int literal);
 
       // Returns this clause when the given literals are applied as facts to it
+      // If the Clause is satisfied through this, {0} is returned
       cnf::Clause getPartialClause(const cnf::Literals& literals) const;
 
       // Renames the literals in the clause from old to new
