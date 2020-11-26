@@ -4,11 +4,6 @@
 
 namespace preppy::procedures {
 
-   // TODO: reimplement with watched literals for better complexity
-   
-   // A ordered set of literals for quick lookup
-   typedef std::vector<int> literals;
-
    class BooleanConstraintPropagation
       : public Procedure {
    public:
@@ -27,10 +22,10 @@ namespace preppy::procedures {
       void applySingleLiteralEq(cnf::CNF& formula, const int literal) const;
 
       // Applies boolean constraint propagation on the formula with all given literals
-      void applyLiterals(cnf::CNF& formula, const literals& literals) const;
+      void applyLiterals(cnf::CNF& formula, const cnf::Literals& literals) const;
 
       // Applies bcp on the formula with all given literals and adds them to the formula as givens to keep models intact
-      void applyLiteralsEq(cnf::CNF& formula, const literals& literals) const;
+      void applyLiteralsEq(cnf::CNF& formula, const cnf::Literals& literals) const;
 
    protected:
 
