@@ -23,9 +23,12 @@ namespace preppy::cnf {
       // Construct this Clause from a line in a cnf file
       explicit Clause(const std::string& line);
 
-      // Sets the given literal to true, if the clause becomes satisfied through this it will be empty
+      // Sets the given literal to true, removes it from the clause if it's negated
       // Returns true if the clause is satisfied afterwards
       bool setLiteral(const int literal);
+
+      // Returns this clause when the given literals are applied as facts to it
+      cnf::Clause getPartialClause(const cnf::Literals& literals) const;
 
       // Renames the literals in the clause from old to new
       void renameVariable(const unsigned oldVar, const unsigned newVar);

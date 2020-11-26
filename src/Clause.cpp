@@ -47,6 +47,16 @@ namespace preppy::cnf {
       return false;
    }
 
+   cnf::Clause Clause::getPartialClause(const cnf::Literals& literals) const {
+      cnf::Clause result(*this);
+      for (const auto& lit : literals) {
+         if (result.setLiteral(lit)) {
+            return {};
+         }
+      }
+      return result;
+   }
+
    void Clause::renameVariable(const unsigned oldVar, const unsigned newVar) {
       for (auto& lit : *this) {
          if (std::abs(lit) == oldVar) {
