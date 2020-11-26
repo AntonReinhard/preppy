@@ -50,7 +50,7 @@ int main(const int argc, char** argv) {
 
    procedure.apply(testCNF);
 
-   util::Utility::logOutput("Formula: ", testCNF.toString());
+   util::Utility::logOutput("Formula:\n", testCNF.toString());
 
    util::Utility::cleanup();
 }

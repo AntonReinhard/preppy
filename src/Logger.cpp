@@ -13,7 +13,7 @@ namespace preppy::log {
         : logLevel(logLevel) {
         this->start = util::clock::now();
         
-        this->logOutput("Logger created at " + util::Utility::getDateTime() + " with logging level \"" + logLevelToString(logLevel) + "\"");
+        this->logDebug("Logger created at " + util::Utility::getDateTime() + " with logging level \"" + logLevelToString(logLevel) + "\"");
 
         this->logLogo();
     }
@@ -62,22 +62,42 @@ namespace preppy::log {
         if (logLevel == NOTHING) {
             return;
         }
-        std::ostringstream ss;
-        ss << this->getCurrentTimeString() << " ";
-        ss << message;
-        
-        std::cerr << ss.str() << std::endl;
+        std::ostringstream outputss;
+        std::istringstream inputss(message);
+        std::string line;
+
+        // take lines apart so every line has the time and log level at the start in the log
+        while (std::getline(inputss, line)) {
+            if (line.empty()) { // discard emtpty lines, e.g. in case there's a newline at the end of message
+                continue;
+            }
+            outputss << this->getCurrentTimeString() << " ";
+            outputss << line << std::endl;
+        }
+
+        // write everything to cout
+        std::cout << outputss.str() << std::flush;
     }
 
     void Logger::log(const std::string& message, const LOG_LEVEL logLevel) {
-        const std::lock_guard<std::mutex> lock(mutex);
+        const std::lock_guard<std::mutex> lock(this->mutex);
         
         if (logLevel <= this->logLevel) {
-            std::ostringstream ss;
-            ss << this->getCurrentTimeString() << " " << logLineStart(logLevel);
-            ss << message;
-            
-            std::cerr << ss.str() << std::endl;
+            std::ostringstream outputss;
+            std::istringstream inputss(message);
+            std::string line;
+
+            // take lines apart so every line has the time and log level at the start in the log
+            while (std::getline(inputss, line)) {
+                if (line.empty()) { // discard emtpty lines, e.g. in case there's a newline at the end of message
+                    continue;
+                }
+                outputss << this->getCurrentTimeString() << " " << logLineStart(logLevel);
+                outputss << line << std::endl;
+            }
+
+            // write everything to cout
+            std::cout << outputss.str() << std::flush;
         }
     }
 
