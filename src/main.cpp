@@ -5,6 +5,7 @@
 #include "procedures/BackboneSimplification.h"
 #include "procedures/BipartitionAndElimination.h"
 #include "procedures/BooleanConstraintPropagation.h"
+#include "procedures/Vivification.h"
 
 #include <string>
 #include <algorithm>
@@ -40,14 +41,16 @@ int main(const int argc, char** argv) {
       util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) after compression");
    }
 
-   procedures::BooleanConstraintPropagation procedure;
-   auto outputVariables = procedure.getBcp(testCNF);
+   procedures::Vivification procedure;
+   
+   /*
    std::stringstream ss;
    for (const auto& var : outputVariables) {
       ss << var << " ";
    }
    util::Utility::logOutput("Unit propagated Literals: ", ss.str());
-
+   */
+  
    procedure.apply(testCNF);
 
    util::Utility::logOutput("Formula:\n", testCNF.toString());
