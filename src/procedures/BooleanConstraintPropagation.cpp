@@ -42,9 +42,9 @@ namespace preppy::procedures {
          }
 
          //if there's at least 2 literals, add the first two literals of the clause to the watched literals
-         size_t index = std::abs(clause[0]) + (clause[0] > 0);
+         size_t index = std::abs(2 * clause[0]) + (clause[0] > 0);
          watchedLiterals.at(index).push_back(&clause);
-         index = std::abs(clause[1]) + (clause[1] > 0);
+         index = std::abs(2 * clause[1]) + (clause[1] > 0);
          watchedLiterals.at(index).push_back(&clause);
       }
       
@@ -52,12 +52,32 @@ namespace preppy::procedures {
          return {};
       }
 
-      for (auto i = 0; i < units.size(); ++i) {
+      for (size_t i = 0; i < units.size(); ++i) {
          auto literal = units[i];
-         size_t index = std::abs(literal) + (literal > 0);
+         size_t index = std::abs(2 * literal) + (literal < 0);  // use < here because the negated literal needs to be checked now
          std::vector<cnf::Clause*>& watched = watchedLiterals.at(index);
-      }
 
+         for (auto& clause : watched) {
+            // check if we produced a unit clause
+            cnf::Clause partialClause = clause->getPartialClause(units);
+            if (partialClause.size() == 0) {
+               // clause is empty -> clause is satisfied
+               continue;
+            }
+            if (partialClause.size() == 1) {
+               // new unit clause -> add to units
+               // do nothing else since if we come across the same clause again it will be satisfied and not get here
+               units.push_back(partialClause[0]);
+            }
+            else {
+               // there's 2 or more literals
+               // choose a new literal to watch
+               // we always watch the first two, so without the one currently being propagated, start watching the second now
+               size_t newIndex = std::abs(2 * partialClause.at(1)) + (partialClause.at(1) > 0);
+               watchedLiterals.at(newIndex).push_back(clause);
+            }
+         }
+      }
 
       return units;
    }
