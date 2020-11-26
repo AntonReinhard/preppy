@@ -6,20 +6,10 @@ namespace preppy::procedures {
 
    bool BooleanConstraintPropagation::apply(cnf::CNF& formula) {
       // Unit propagation -> find unit clauses
-      cnf::Literals units;
-      for (const auto& clause : formula) {
-         if (clause.size() == 1) {
-            units.push_back(clause[0]);
-         }
-      }
-      
-      if (units.empty()) {
-         return false;
-      }
+      cnf::Literals units = this->getBcp(formula);
 
+      // apply
       this->applyLiterals(formula, units);
-      this->apply(formula);   // new unit clauses could have been made -> try again
-      // this is not very efficient
 
       return true;
    }
