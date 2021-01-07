@@ -1,4 +1,16 @@
+/**
+ * @file CNF.cpp
+ * @author Anton Reinhard
+ * @brief CNF implementation
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "CNF.h"
+#include "Clause.h"
 #include "Utility.h"
 
 #include <vector>
@@ -122,6 +134,7 @@ namespace preppy::cnf {
 
    bool CNF::readFromFile(const std::string& filepath) {
       this->name = filepath;
+      this->source = filepath;
       if (!util::Utility::fileExists(filepath)) {
          util::Utility::logError("File ", filepath, " doesn't exist");
          return false;
@@ -268,6 +281,14 @@ namespace preppy::cnf {
       return this->size();
    }
 
+   unsigned CNF::getLiterals() const {
+      unsigned totalLiterals = 0;
+      for (const auto& clause : *this) {
+         totalLiterals += clause.size();
+      }
+      return totalLiterals;
+   }
+
    bool CNF::isCompressed() {
       return this->getVariables() == this->getMaxVariable();
    }
@@ -288,6 +309,8 @@ namespace preppy::cnf {
       return varCount;
    }
 
+   #pragma region vectorfunctions
+   
    Clauses::iterator CNF::begin() noexcept {
       return this->clauses.begin();
    }
@@ -399,5 +422,7 @@ namespace preppy::cnf {
    Clauses::size_type CNF::max_size() const noexcept {
       return this->clauses.max_size();
    }
+
+   #pragma endregion vectorfunctions
 
 }

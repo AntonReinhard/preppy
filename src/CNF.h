@@ -1,82 +1,185 @@
+/**
+ * @file CNF.h
+ * @author Anton Reinhard
+ * @brief CNF Formula
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #pragma once
 #include "Clause.h"
 #include "Model.h"
 #include "definitions.h"
 
 #include <vector>
+#include <filesystem>
 #include <initializer_list>
 #include <tuple>
 
 namespace preppy::cnf {
 
-   /*
-    * Represents a CNF Formula. Derived from a vector of Clauses
+   /**
+    * @brief Represents a CNF Formula. Derived from a vector of Clauses
+    * 
     */
    class CNF {
    public:
 
-      // Creates empty CNF
+      /**
+       * @brief Creates empty CNF
+       * 
+       */
       CNF();
 
-      // Creates a CNF with given initializer list of Clauses
+      /**
+       * @brief Creates a CNF with given initializer list of Clauses
+       * 
+       * @param l initializer list of clauses
+       */
       CNF(std::initializer_list<Clauses::value_type> l);
 
-      // Compresses this formula
+      /**
+       * @brief Compresses this formula
+       * 
+       */
       void compress();
 
-      // Compresses a single literal from the original formula to this version
+      /**
+       * @brief Compresses a single literal from the original formula to this version, i.e. it looks up what the given literal in the original is called now
+       * 
+       * @param literal The literal to compress
+       * @return int The compressed literal
+       */
       int compress(int literal);
 
-      // Compresses a model of the original formula to a model of this version
+      /**
+       * @brief Compresses a model of the original formula to a model of this version
+       * 
+       * @param model The Model to compress
+       */
       void compress(cnf::Model& model);
 
-      // Decompresses this formula using the saved compressionInformation
+      /**
+       * @brief Decompresses this formula using the saved compressionInformation
+       * 
+       */
       void decompress();
 
-      // Decompresses a single literal from this version of the formula to the original
+      /**
+       * @brief Decompresses a single literal from this version of the formula to the original
+       * 
+       * @param literal The Literal to decompress
+       * @return int The decompressed literal
+       */
       int decompress(int literal);
 
-      // Decompresses a model from this version of the formula to the original
+      /**
+       * @brief Decompresses a model from this version of the formula to the original
+       * 
+       * @param model The Model to decompress
+       */
       void decompress(cnf::Model& model);
 
-      // Renames the given variable to the new name, does not check if the new name was already used
+      /**
+       * @brief Renames the given variable to the new name, does not check if the new name was already used
+       * 
+       * @param variable The current variable's name
+       * @param newName The name to rename the variable to
+       */
       void renameVariable(const unsigned variable, const unsigned newName);
 
-      // Joins a second formula to this one, adding all clauses
+      /**
+       * @brief Joins a second formula to this one, adding all clauses
+       * 
+       * @param formula The other formula to join with this
+       */
       void joinFormula(const cnf::CNF& formula);
 
-      // To call when a literal was backpropagated and is now not part of the formula anymore, so it can be compressed again
+      /**
+       * @brief To call when a literal was backpropagated and is now not part of the formula anymore, so it can be compressed again
+       * 
+       * @param literal The literal to set as having been backpropagated
+       */
       void setLiteralBackpropagated(int literal);
 
-      // Generate a string containing this CNF Formula in .cnf format
+      /**
+       * @brief Generate a string containing this CNF Formula in .cnf format
+       * 
+       * @return std::string The formula in .cnf format as a string
+       */
       std::string toString() const;
 
-      // Read a cnf file, return success
+      /**
+       * @brief Create this object from a given cnf file
+       * 
+       * @param filepath The path to the cnf file to read
+       * @return bool True if successfull
+       */
       bool readFromFile(const std::string& filepath);
 
-      // Writes this formula to the given filepath, returns true on success
-      // if force is set to true it will force override any existing file
+      /**
+       * @brief Writes this formula to a file
+       * 
+       * @param filepath The file path to write to
+       * @param force When set any existing file will be overriden
+       * @return bool True on success
+       */
       bool writeToFile(const std::string& filepath, const bool force = false);
 
-      // Returns the amount of variables in the formula
+      /**
+       * @brief Returns the amount of variables in the formula
+       * 
+       * @return unsigned The number of distinct used variables in this formula
+       */
       unsigned getVariables();
 
-      // Returns the maximum variable number in the formula. Should usually be the same as getVariables but can differ in improperly saved cnf files
+      /**
+       * @brief Returns the maximum variable number in the formula. 
+       * Will usually be the same as getVariables but can differ in improperly saved cnf files or during modifications to the formula.
+       * 
+       * @return unsigned The maximum variable in the formula
+       */
       unsigned getMaxVariable();
 
-      // Returns the number of clauses in the formula
+      /**
+       * @brief Returns the number of clauses in the formula
+       * 
+       * @return unsigned The number of clauses in the formula
+       */
       unsigned getClauses() const;
 
-      // Returns true if there are any variables that don't occur in the formula but are smaller than the biggest variable
+      /**
+       * @brief Returns the number of total literals in the formula
+       * 
+       * @return unsigned The number of literals in the formula, counting duplicates
+       */
+      unsigned getLiterals() const;
+
+      /**
+       * @brief Checks whether there are any variables that don't occur in the formula but are smaller than the biggest variable
+       * 
+       * @return bool True if maxVariable == Variables
+       */
       bool isCompressed();
 
-      // when changing the formula from the outside, call this to set the dirty bits to true again
+      /**
+       * @brief Sets the dirty bits to true.
+       * Call this when changing the formula from the outside.
+       * 
+       */
       void setDirtyBitsTrue();
 
-      // Counts how often a variable appears in the formula and returns a vector, where the nth place is how often n appears
+      /**
+       * @brief Counts how often a variable appears in the formula and returns a vector, where the nth place is how often n appears
+       * 
+       * @return std::vector<unsigned> The vector containing variable occurrence counts
+       */
       std::vector<unsigned> countVariables();
 
-
+      #pragma region vectorfunctions
       // exposing vector member functions for clauses
       // access
       Clauses::iterator begin() noexcept;
@@ -124,31 +227,60 @@ namespace preppy::cnf {
       Clauses::size_type size() const noexcept;
       Clauses::size_type max_size() const noexcept;
 
+      #pragma endregion vectorfunctions
+
    protected:
 
 
    private:
 
-      // the clauses in this formula
+      /**
+       * @brief The clauses in this formula. Exposed using the standard vector functions
+       * 
+       */
       Clauses clauses;
 
-      // name of the formula, currently the file path it was read from
+      /**
+       * @brief Name of the formula
+       * 
+       */
       std::string name;
 
-      // number of variables in this formula, stored so it does not need to be recalculated every time
+      /**
+       * @brief The original path the formula was read from
+       * 
+       */
+      std::filesystem::path source;
+
+      /**
+       * @brief Number of variables in this formula, stored so it does not need to be recalculated every time it is asked
+       * 
+       */
       unsigned variables;
 
-      // dirty bit for variables count, if true "variables" might be wrong
+      /**
+       * @brief Dirty bit for variables count, if true "variables" might be wrong
+       * 
+       */
       bool variablesDirtyBit = true;
 
-      // the maximum variable in this formula, stored so it does not need to be recalculated every time
+      /**
+       * @brief The maximum variable in this formula, stored so it does not need to be recalculated every time it is asked
+       * 
+       */
       unsigned maxVariable;
 
-      // dirty bit for the maxVariable, if true "maVariable" might be wrong
+      /**
+       * @brief Dirty bit for the maxVariable, if true "maVariable" might be wrong
+       * 
+       */
       bool maxVariableDirtyBit = true;
 
-      // compression information for compressing original models and decompressing models of this to the original
-      // the first number represents the original number, the second the new; the boolean saves if the replaced variable was assigned true or false
+      /**
+       * @brief Compression information for compressing original models and decompressing models of this to the original
+       * the first number represents the original number, the second the new; the boolean saves if the replaced variable was assigned true or false
+       * 
+       */
       std::vector<std::tuple<unsigned, unsigned, bool>> compressionInformation;
    };
 
