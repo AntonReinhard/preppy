@@ -1,3 +1,14 @@
+/**
+ * @file main.cpp
+ * @author Anton Reinhard
+ * @brief main file
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "CNF.h"
 #include "Clause.h"
 #include "Utility.h"
@@ -27,33 +38,35 @@ int main(const int argc, char** argv) {
    util::Utility::logOutput("Reading file \"", inputFileName, "\"");
    testCNF.readFromFile(inputFileName);
 
-   auto variables = testCNF.getVariables();
-   auto maxVariable = testCNF.getMaxVariable();
-   auto clauses = testCNF.getClauses();
+   auto variablesPre = testCNF.getVariables();
+   auto maxVariablePre = testCNF.getMaxVariable();
+   auto clausesPre = testCNF.getClauses();
+   auto literalsPre = testCNF.getLiterals();
 
-   util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) and ", clauses, " clauses");
+   util::Utility::logOutput("CNF has ", variablesPre, " variables (", maxVariablePre, " max), ", clausesPre, " clauses and ", literalsPre, " literals");
 
    if (!testCNF.isCompressed()) {
       util::Utility::logOutput("Formula isn't compressed, compressing...");
       testCNF.compress();
-      variables = testCNF.getVariables();
-      maxVariable = testCNF.getMaxVariable();
-      util::Utility::logOutput("CNF has ", variables, " variables (", maxVariable, " max) after compression");
+      variablesPre = testCNF.getVariables();
+      maxVariablePre = testCNF.getMaxVariable();
+      util::Utility::logOutput("CNF has ", variablesPre, " variables (", maxVariablePre, " max) after compression");
    }
 
    procedures::Vivification procedure;
    
-   /*
-   std::stringstream ss;
-   for (const auto& var : outputVariables) {
-      ss << var << " ";
-   }
-   util::Utility::logOutput("Unit propagated Literals: ", ss.str());
-   */
-  
    procedure.apply(testCNF);
 
-   util::Utility::logOutput("Formula:\n", testCNF.toString());
+   auto variablesPost = testCNF.getVariables();
+   auto maxVariablePost = testCNF.getMaxVariable();
+   auto clausesPost = testCNF.getClauses();
+   auto literalsPost = testCNF.getLiterals();
+
+   util::Utility::logOutput("CNF has ", variablesPost, " variables (", maxVariablePost, " max), ", clausesPost, " clauses and ", literalsPost, " literals");
+
+   util::Utility::logOutput("Removed ", clausesPre - clausesPost, " clauses and ", literalsPre - literalsPost, " literals");
+
+   testCNF.writeToFile("out.cnf", true);
 
    util::Utility::cleanup();
 }

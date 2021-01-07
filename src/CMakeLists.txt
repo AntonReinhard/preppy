@@ -15,14 +15,6 @@ add_executable(${PROJECT_NAME}
    procedures/Vivification.cpp
 )
 
-target_compile_options(${PROJECT_NAME}
-   PRIVATE
-      -Wall
-      -Wpedantic
-      -Wextra
-      -O3
-)
-
 target_link_libraries(${PROJECT_NAME}
    pthread
 )

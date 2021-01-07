@@ -15,17 +15,24 @@ fi
 
 if [ -d "build" ]
 then
-    echo "Deleting build"
-    rm -r build
+    echo "build directory already exists"
+else
+    mkdir build
 fi
 
 if [ -d "install" ]
 then
-    echo "Deleting install"
-    rm -r install
+    echo "install directory already exists"
+else
+    mkdir install
 fi
 
-mkdir build && mkdir install
+if [ -d "output" ]
+then
+    echo "output directory already exists"
+else
+    mkdir output
+fi
 
 cd build
 echo "Executing cmake"

@@ -19,7 +19,7 @@ namespace preppy::procedures {
 
       // saves pointers to clauses, each clause is in here exactly twice (except for unit clauses)
       // index 2l points is for literal -l, index 2l + 1 for literal l
-      std::vector<std::vector<cnf::Clause*>> watchedLiterals(2*(formula.getMaxVariable()+1));
+      std::vector<std::vector<cnf::Clause*>> watchedLiterals(2 * (formula.getMaxVariable() + 2));
       // Unit propagation -> find unit clauses
       cnf::Literals units;
       for (auto& clause : formula) {

@@ -16,14 +16,15 @@ namespace preppy::procedures {
             formula.erase(formula.begin());
 
             cnf::Clause newClause;
-            auto bcpLiterals = bcp.getBcp(formula);
+
+            cnf::CNF tempFormula = formula;
+            tempFormula.joinFormula(newFormula);
+            // take bcp of formula ∪ newFormula
+            auto bcpLiterals = bcp.getBcp(tempFormula);
+
+            bool satisfied = false;
 
             while (currentClause.size() != 0) {
-                // if new Clause is satisfied -> break
-                if (newClause.size() != 0 && newClause[0] == 0) {
-                    break;
-                }
-
                 // choose literal from currentClause such that its negation is not part of bcpLiterals
                 int l = 0;
                 for (size_t i = 0; i < currentClause.size(); ++i) {
@@ -51,18 +52,19 @@ namespace preppy::procedures {
                 }
 
                 // take bcp of formula ∪ newFormula
-                cnf::CNF tempFormula(formula);
-                tempFormula.joinFormula(newFormula);
                 tempFormula.push_back(complementaryNewClause);
-
                 bcpLiterals = bcp.getBcp(tempFormula);
+                //delete complementaryNewClause again
+                tempFormula.erase(tempFormula.end() - 1);
 
                 if (!bcpLiterals.empty() && bcpLiterals[0] == 0) {
-                    newClause.insert(newClause.begin(), 0);
+                    // if new Clause is satisfied -> break
+                    satisfied = true;
+                    break;
                 }
             }
 
-            if (newClause[0] != 0) {
+            if (!satisfied) {
                 newFormula.push_back(newClause);
             }
         }
