@@ -181,12 +181,28 @@ namespace preppy::util {
       }
 
       /**
-       * @brief Checks if a file exists
+       * @brief Checks if a file or directory exists at the given path
        * 
        * @param path The path to the file to check
        * @return bool True if the file exists
        */
       static bool fileExists(const std::string& path);
+
+      /**
+       * @brief Checks whether the given path refers to a directory
+       * 
+       * @param path The path to check
+       * @return bool True if the path refers to a directory
+       */
+      static bool isDirectory(const std::string& path);
+
+      /**
+       * @brief Checks whether the given path refers to a file
+       * 
+       * @param path The path to check
+       * @return bool True if the path refers to a file
+       */
+      static bool isFile(const std::string& path);
 
       /**
        * @brief Initializes Signal Handling

@@ -42,6 +42,13 @@ namespace preppy::cnf {
       CNF(std::initializer_list<Clauses::value_type> l);
 
       /**
+       * @brief Get a CNF with the same Metadata as this CNF, but no clauses
+       * 
+       * @return CNF The new CNF
+       */
+      CNF getMetadataCopy() const;
+
+      /**
        * @brief Compresses this formula
        * 
        */
@@ -121,11 +128,13 @@ namespace preppy::cnf {
       bool readFromFile(const std::string& filepath);
 
       /**
-       * @brief Writes this formula to a file
+       * @brief Writes this formula to a path
        * 
-       * @param filepath The file path to write to
+       * @param filepath A file path or directory to write to. 
        * @param force When set any existing file will be overriden
        * @return bool True on success
+       * 
+       * In case of a directory the original file name + out.cnf will be used. In case of a file the exact path will be used
        */
       bool writeToFile(const std::string& filepath, const bool force = false);
 

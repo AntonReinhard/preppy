@@ -17,7 +17,7 @@
 namespace preppy::procedures {
 
    bool Vivification::apply(cnf::CNF &formula) {
-      cnf::CNF newFormula;
+      cnf::CNF newFormula = formula.getMetadataCopy();
 
       procedures::BooleanConstraintPropagation bcp;
 

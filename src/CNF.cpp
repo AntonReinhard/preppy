@@ -34,6 +34,13 @@ namespace preppy::cnf {
 
    }
 
+   CNF CNF::getMetadataCopy() const {
+      CNF copy;
+      copy.name = this->name;
+      copy.source = this->source;
+      return copy;
+   }
+
    void CNF::compress() {
       util::Utility::logDebug("Compressing CNF by ", this->getMaxVariable() - this->getVariables(), " variables");
 
@@ -221,17 +228,39 @@ namespace preppy::cnf {
    }
 
    bool CNF::writeToFile(const std::string& path, const bool force) {
-      if (!force && util::Utility::fileExists(path)) {
-         util::Utility::logWarning("File ", path, " already exists");
-         return false;
-      }
-      std::ofstream file(path);
-      if (!file.is_open()) {
-         if (util::Utility::fileExists(path)) {
-            util::Utility::logError("Couldn't open file ", path);
+      std::filesystem::path filePath;
+
+      if (util::Utility::isDirectory(path)) {
+         std::string origFileName;
+         if (!this->source.has_stem()) {
+            util::Utility::logWarning("CNF doesn't have an original file name, using default 'out'");
          }
          else {
-            util::Utility::logError("Couldn't create file ", path);
+            origFileName = this->source.stem();
+         }
+         origFileName += "out";
+         filePath = path + origFileName;
+         filePath.replace_extension("cnf");
+      }
+      else {
+         // assume it's a file
+         filePath = path;
+      }
+
+      util::Utility::logDebug("Writing CNF to file ", filePath);
+
+      if (!force && util::Utility::fileExists(filePath)) {
+         util::Utility::logWarning("File ", filePath, " already exists");
+         return false;
+      }
+
+      std::ofstream file(filePath);
+      if (!file.is_open()) {
+         if (util::Utility::fileExists(path)) {
+            util::Utility::logError("Couldn't open file ", filePath);
+         }
+         else {
+            util::Utility::logError("Couldn't create file ", filePath);
          }
          return false;
       }

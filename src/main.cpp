@@ -54,7 +54,6 @@ int main(const int argc, char** argv) {
    }
 
    procedures::Vivification procedure;
-   
    procedure.apply(testCNF);
 
    auto variablesPost = testCNF.getVariables();
@@ -63,10 +62,9 @@ int main(const int argc, char** argv) {
    auto literalsPost = testCNF.getLiterals();
 
    util::Utility::logOutput("CNF has ", variablesPost, " variables (", maxVariablePost, " max), ", clausesPost, " clauses and ", literalsPost, " literals");
-
    util::Utility::logOutput("Removed ", clausesPre - clausesPost, " clauses and ", literalsPre - literalsPost, " literals");
 
-   testCNF.writeToFile("out.cnf", true);
+   testCNF.writeToFile("output/", true);
 
    util::Utility::cleanup();
 }
