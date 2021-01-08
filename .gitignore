@@ -34,5 +34,6 @@
 src/definitions.h
 build/
 install/
+doc/
 .vscode/
 examples/
