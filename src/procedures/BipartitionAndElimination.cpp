@@ -1,7 +1,18 @@
+/**
+ * @file BipartitionAndElimination.cpp
+ * @author Anton Reinhard
+ * @brief Bipartition and Elimination Procedure implementation
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "BipartitionAndElimination.h"
-#include "../solvers/clasp.h"
 #include "BackboneSimplification.h"
 #include "BooleanConstraintPropagation.h"
+#include "../solvers/clasp.h"
 #include "../definitions.h"
 
 #include <algorithm>

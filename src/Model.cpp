@@ -1,3 +1,14 @@
+/**
+ * @file Model.cpp
+ * @author Anton Reinhard
+ * @brief Model implementation
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "Model.h"
 #include "Utility.h"
 
@@ -6,9 +17,7 @@
 
 namespace preppy::cnf {
 
-   Model::Model() {
-
-   }
+   Model::Model() = default;
 
    bool Model::readFromFile(const std::string& filepath) {
       if (!util::Utility::fileExists(filepath)) {

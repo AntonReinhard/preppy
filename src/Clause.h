@@ -1,3 +1,14 @@
+/**
+ * @file Clause.h
+ * @author Anton Reinhard
+ * @brief Clause header
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #pragma once
 
 #include "definitions.h"
@@ -8,40 +19,79 @@
 
 namespace preppy::cnf {
 
-   /*
-    * Representing a Clause, consisting of literals represented by numbers. Negative number means the literal is negated.
+   /**
+    * @brief Representing a Clause, consisting of literals represented by numbers. Negative number means the literal is negated.
+    * 
     */
    class Clause {
    public:
 
-      // Construct empty Clause
+      /**
+       * @brief Construct empty Clause
+       * 
+       */
       Clause() = default;
 
-      // Constructs clause with given literals
+      /**
+       * @brief Constructs clause with given literals
+       * 
+       * @param l An initializer list of literals
+       */
       Clause(std::initializer_list<Literals::value_type> l);
 
-      // Construct this Clause from a line in a cnf file
+      /**
+       * @brief Construct this Clause from a line in a cnf file
+       * 
+       * @param line The line in the cnf file
+       */
       explicit Clause(const std::string& line);
 
-      // Sets the given literal to true, removes it from the clause if it's negated
-      // Returns true if the clause is satisfied afterwards
+      /**
+       * @brief Sets the given literal to true, removes it from the clause if it's negated
+       * 
+       * @param literal The literal to set
+       * @return bool True if the clause is satisfied afterwards
+       */
       bool setLiteral(const int literal);
 
-      // Returns this clause when the given literals are applied as facts to it
-      // If the Clause is satisfied through this, {0} is returned
+      /**
+       * @brief Returns this clause when the given literals are applied as facts to it
+       * 
+       * @param literals The literals to apply
+       * @return cnf::Clause The resulting clause, {0} if satisfied
+       */
       cnf::Clause getPartialClause(const cnf::Literals& literals) const;
 
-      // Renames the literals in the clause from old to new
+      /**
+       * @brief Renames the literals in the clause from old to new
+       * 
+       * @param oldVar Old/Current name of the variable
+       * @param newVar New name to give to the variable
+       */
       void renameVariable(const unsigned oldVar, const unsigned newVar);
 
-      // Get this clause as a human readable string
+      /**
+       * @brief Get this clause as a human readable string
+       * 
+       * @return std::string The clause as readable string
+       */
       std::string toString() const;
 
-      // Get a string representing this clause in cnf format
+      /**
+       * @brief Get a string representing this clause in cnf format
+       * 
+       * @return std::string The clause as cnf string
+       */
       std::string toCNFLine() const;
 
-      // Returns the maximum occuring variable in this clause
+      /**
+       * @brief Get the maximum occurring variable in this clause
+       * 
+       * @return unsigned The maximum variable
+       */
       unsigned getMaxVariable() const;
+
+#pragma region vectorfunctions
 
       // exposing vector member functions for literals
       // access
@@ -90,12 +140,17 @@ namespace preppy::cnf {
       Literals::size_type size() const noexcept;
       Literals::size_type max_size() const noexcept;
 
+#pragma endregion vectorfunctions
+
    protected:
 
 
    private:
 
-      // The literals in this Clause
+      /**
+       * @brief The literals in this Clause \n Exposed through the standard vector functions
+       * 
+       */
       Literals literals;
 
    };

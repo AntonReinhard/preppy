@@ -1,3 +1,14 @@
+/**
+ * @file Logger.cpp
+ * @author Anton Reinhard
+ * @brief Logger implementation
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "Logger.h"
 #include "definitions.h"
 #include "Utility.h"

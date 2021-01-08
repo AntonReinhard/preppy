@@ -179,7 +179,8 @@ namespace preppy::cnf {
        */
       std::vector<unsigned> countVariables();
 
-      #pragma region vectorfunctions
+#pragma region vectorfunctions
+
       // exposing vector member functions for clauses
       // access
       Clauses::iterator begin() noexcept;
@@ -227,7 +228,7 @@ namespace preppy::cnf {
       Clauses::size_type size() const noexcept;
       Clauses::size_type max_size() const noexcept;
 
-      #pragma endregion vectorfunctions
+#pragma endregion vectorfunctions
 
    protected:
 

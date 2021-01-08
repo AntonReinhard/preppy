@@ -1,3 +1,14 @@
+/**
+ * @file Utility.cpp
+ * @author Anton Reinhard
+ * @brief Utility functions implementation
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "Utility.h"
 #include "definitions.h"
 #include "solvers/clasp.h"

@@ -1,3 +1,14 @@
+/**
+ * @file BackboneSimplification.cpp
+ * @author Anton Reinhard
+ * @brief Backbone Simplification implementation
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "BackboneSimplification.h"
 #include "BooleanConstraintPropagation.h"
 #include "../Model.h"

@@ -1,3 +1,14 @@
+/**
+ * @file definitions.h.in
+ * @author Anton Reinhard
+ * @brief definitions file, processed by CMake
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #pragma once
 
 #include <chrono>
@@ -5,8 +16,16 @@
 #include <vector>
 
 namespace preppy::util {
+    /**
+     * @brief The clock used throughout the program
+     * 
+     */
     typedef std::chrono::steady_clock clock;
 
+    /**
+     * @brief The program version
+     * 
+     */
     const std::string VERSION = "${PREPPY_VERSION}";
 }
 
@@ -19,7 +38,10 @@ namespace preppy::cnf {
 
 namespace preppy::log {
  
-    // The logging level, specifies what will be logged and what won't
+    /**
+     * @brief The logging level, specifies what will be logged and what won't
+     * 
+     */
     enum LOG_LEVEL {
         NOTHING = 0,
         ERROR   = 1,

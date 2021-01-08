@@ -1,3 +1,14 @@
+/**
+ * @file Clause.cpp
+ * @author Anton Reinhard
+ * @brief Clause implementation
+ * @version 0.1
+ * @date 2021-01-08
+ * 
+ * @copyright Copyright (c) 2021
+ * 
+ */
+
 #include "Clause.h"
 #include "Utility.h"
 #include "definitions.h"
@@ -96,6 +107,8 @@ namespace preppy::cnf {
       }
       return max;
    }
+
+#pragma region vectorfunctions
 
    Literals::iterator Clause::begin() noexcept {
       return this->literals.begin();
@@ -208,5 +221,7 @@ namespace preppy::cnf {
    Literals::size_type Clause::max_size() const noexcept {
       return this->literals.max_size();
    }
+
+#pragma endregion vectorfunctions
 
 }

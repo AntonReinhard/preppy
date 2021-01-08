@@ -309,7 +309,7 @@ namespace preppy::cnf {
       return varCount;
    }
 
-   #pragma region vectorfunctions
+#pragma region vectorfunctions
    
    Clauses::iterator CNF::begin() noexcept {
       return this->clauses.begin();
@@ -423,6 +423,6 @@ namespace preppy::cnf {
       return this->clauses.max_size();
    }
 
-   #pragma endregion vectorfunctions
+#pragma endregion vectorfunctions
 
 }
