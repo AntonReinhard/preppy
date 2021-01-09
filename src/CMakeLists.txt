@@ -10,9 +10,11 @@ add_executable(${PROJECT_NAME}
    CommandLineParser.cpp
    solvers/Solver.cpp
    solvers/clasp.cpp
+   procedures/Procedure.cpp
    procedures/BackboneSimplification.cpp
-   procedures/BooleanConstraintPropagation.cpp
    procedures/BipartitionAndElimination.cpp
+   procedures/BooleanConstraintPropagation.cpp
+   procedures/OccurrenceSimplification.cpp
    procedures/Vivification.cpp
 )
 

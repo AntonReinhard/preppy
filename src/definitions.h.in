@@ -54,15 +54,44 @@ namespace preppy::cnf {
    typedef std::vector<unsigned> Variables;
    class Clause;
    typedef std::vector<cnf::Clause> Clauses;
+
+   /**
+    * @brief Equivalence types of CNF formulas. Every entry implies all following entries.
+    * An Equivalent formula will also be #Equivalent, a #Equivalent formula is also satEquivalent.
+    * 
+    */
+   enum class EQUIVALENCE_TYPE {
+      /**
+       * @brief EQUIVALENT means that a model satisfies either both input and output formula, or none.
+       */
+      EQUIVALENT           = 0,
+      /**
+       * @brief NUMBER_EQUIVALENT means the number of models for the input formula is the same as for the output 
+       * formula. Models themselves can be different though.
+       */
+      NUMBER_EQUIVALENT    = 1,
+      /**
+       * @brief SAT_EQUIVALENT means that the output formula is satisfiable if and only if the input formula was
+       * satisfiable.
+       */
+      SAT_EQUIVALENT       = 2,
+      /**
+       * @brief UNEQUIVALENT means that no general statement can be made about the output formula with respect
+       * to the input formula. Should never be produced by any procedures
+       */
+      UNEQUIVALENT         = 3
+   };
+
 }
 
 namespace preppy::log {
 
    /**
-    * @brief The logging level, specifies what will be logged and what won't
+    * @brief The logging level, specifies what will be logged and what won't. The values
+    * correspond to the -v <LOG_LEVEL> command line option. The program default is WARNING
     * 
     */
-   enum LOG_LEVEL {
+   enum class LOG_LEVEL {
       NOTHING = 0,
       ERROR   = 1,
       WARNING = 2,

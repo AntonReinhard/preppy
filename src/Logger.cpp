@@ -70,7 +70,7 @@ namespace preppy::log {
     }
 
     void Logger::logOutput(const std::string& message) {
-        if (logLevel == NOTHING) {
+        if (logLevel == LOG_LEVEL::NOTHING) {
             return;
         }
         std::ostringstream outputss;
@@ -114,15 +114,15 @@ namespace preppy::log {
 
     std::string Logger::logLevelToString(const LOG_LEVEL logLevel) {
         switch (logLevel) {
-        case DEBUG:
+        case LOG_LEVEL::DEBUG:
             return "Debug";
-        case INFO:
+        case LOG_LEVEL::INFO:
             return "Info";
-        case WARNING:
+        case LOG_LEVEL::WARNING:
             return "Warning";
-        case ERROR:
+        case LOG_LEVEL::ERROR:
             return "Error";
-        case NOTHING:
+        case LOG_LEVEL::NOTHING:
             return "Nothing";
         default:
             return "Unknown";
@@ -131,15 +131,15 @@ namespace preppy::log {
     
     std::string Logger::logLineStart(const LOG_LEVEL logLevel) {
         switch (logLevel) {
-        case DEBUG:
+        case LOG_LEVEL::DEBUG:
             return "DEBUG:   ";
-        case INFO:
+        case LOG_LEVEL::INFO:
             return "INFO:    ";
-        case WARNING:
+        case LOG_LEVEL::WARNING:
             return "WARNING: ";
-        case ERROR:
+        case LOG_LEVEL::ERROR:
             return "ERROR:   ";
-        case NOTHING:   // should never happen, as nothing will be logged with this loglevel
+        case LOG_LEVEL::NOTHING:   // should never happen, as nothing will be logged with this loglevel
         default:
             return "UNKNOWN: ";
         }

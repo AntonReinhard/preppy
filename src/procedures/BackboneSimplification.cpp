@@ -22,13 +22,12 @@
 namespace preppy::procedures {
 
    BackboneSimplification::BackboneSimplification(std::shared_ptr<solvers::Solver> solver) 
-      : solver(solver) {
+      : Procedure("Backbone Simplification", cnf::EQUIVALENCE_TYPE::EQUIVALENT)
+      , solver(solver) {
 
    }
 
-   bool BackboneSimplification::apply(cnf::CNF& formula) {
-      formula.addProcedure("Backbone Simplification");
-
+   bool BackboneSimplification::impl(cnf::CNF& formula) {
       cnf::Literals backbone = this->getBackbone(formula);
 
       const uint64_t variablesWithoutBackbone = formula.getVariables() - backbone.size();

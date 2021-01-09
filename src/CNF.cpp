@@ -24,7 +24,8 @@ namespace preppy::cnf {
    CNF::CNF() 
       : variablesDirtyBit(true) 
       , maxVariableDirtyBit(true)
-      , totalProcessingTime(0) {
+      , totalProcessingTime(0)
+      , equivalence(EQUIVALENCE_TYPE::EQUIVALENT) {
 
    }
 
@@ -32,7 +33,8 @@ namespace preppy::cnf {
       : clauses(l)
       , variablesDirtyBit(true)
       , maxVariableDirtyBit(true)
-      , totalProcessingTime(0) {
+      , totalProcessingTime(0)
+      , equivalence(EQUIVALENCE_TYPE::EQUIVALENT) {
 
    }
 
@@ -42,6 +44,7 @@ namespace preppy::cnf {
       copy.source = this->source;
       copy.totalProcessingTime = this->totalProcessingTime;
       copy.procedures = this->procedures;
+      copy.equivalence = this->equivalence;
       return copy;
    }
 
@@ -285,6 +288,8 @@ namespace preppy::cnf {
       ss << "c " << this->name << "\n";
       ss << "c Processed by preppy v" << util::VERSION << " Type: " << util::BUILD_TYPE << "\n";
       ss << "c Processing took " << util::Utility::durationToString(this->totalProcessingTime) << "\n";
+      
+      // Add a line telling what procedures were used
       ss << "c Used Procedures: ";
 
       if (this->procedures.empty()) {
@@ -301,9 +306,18 @@ namespace preppy::cnf {
             }
          }
       }
+      ss << "\n";
+
+      // Add a line telling what equivalence to the original input formula remains
+      if (this->equivalence == EQUIVALENCE_TYPE::EQUIVALENT) {
+         ss << "c This formula is Equivalent to the original input formula\n";
+      }
+      else {
+         ss << "c This formula is at least " << cnf::equivalenceTypeToString(this->equivalence) << " to the original input formula\n";
+      }
 
       // actual header line
-      ss << "\np cnf " << this->getMaxVariable() << " " << this->size() << "\n";
+      ss << "p cnf " << this->getMaxVariable() << " " << this->size() << "\n";
 
       return ss.str();
    }
@@ -372,6 +386,12 @@ namespace preppy::cnf {
 
    void CNF::addProcedure(const std::string& procedure) {
       this->procedures.insert(procedure);
+   }
+
+   void CNF::setEquivalence(const cnf::EQUIVALENCE_TYPE eqType) {
+      if (eqType > this->equivalence) {
+         this->equivalence = eqType;
+      }
    }
 
    void CNF::addProcessingTime(const util::clock::duration& duration) {
@@ -493,5 +513,20 @@ namespace preppy::cnf {
    }
 
 #pragma endregion vectorfunctions
+
+   std::string equivalenceTypeToString(cnf::EQUIVALENCE_TYPE eqType) {
+      switch (eqType) {
+      case cnf::EQUIVALENCE_TYPE::EQUIVALENT:
+         return "Equivalent";
+      case cnf::EQUIVALENCE_TYPE::NUMBER_EQUIVALENT:
+         return "#Equivalent";
+      case cnf::EQUIVALENCE_TYPE::SAT_EQUIVALENT:
+         return "satEquivalent";
+      case cnf::EQUIVALENCE_TYPE::UNEQUIVALENT:
+         return "Not Equivalent";
+      default:
+         return "Unknown Equivalence";
+      }
+   }
 
 }

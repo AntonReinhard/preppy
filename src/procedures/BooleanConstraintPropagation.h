@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "Procedures.h"
+#include "Procedure.h"
 
 namespace preppy::procedures {
 
@@ -20,22 +20,14 @@ namespace preppy::procedures {
     * 
     */
    class BooleanConstraintPropagation
-      : public Procedure {
+      : public preppy::procedures::Procedure {
    public:
 
       /**
        * @brief Construct a new Boolean Constraint Propagation procedure
        * 
        */
-      BooleanConstraintPropagation() = default;
-
-      /**
-       * @brief Apply the BCP procedure to a formula
-       * 
-       * @param formula The formula to apply to
-       * @return bool True on success
-       */
-      bool apply(cnf::CNF& formula) override;
+      BooleanConstraintPropagation();
 
       /**
        * @brief Returns all literals that can be derived from the formula using boolean constraint propagation \n If the formula is detected to be unsatisfiable in this process {0} is returned
@@ -79,6 +71,13 @@ namespace preppy::procedures {
 
    protected:
 
+      /**
+       * @brief Apply the BCP procedure to a formula
+       * 
+       * @param formula The formula to apply to
+       * @return bool True on success
+       */
+      bool impl(cnf::CNF& formula) override;
 
    private:
 

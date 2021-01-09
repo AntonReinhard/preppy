@@ -1,9 +1,9 @@
 /**
- * @file Vivification.h
+ * @file OccurrenceSimplification.h
  * @author Anton Reinhard
- * @brief Vivification Procedure header
+ * @brief Occurrence Simplification Procedure header
  * @version 0.1
- * @date 2021-01-08
+ * @date 2021-01-09
  * 
  * @copyright Copyright (c) 2021
  * 
@@ -16,25 +16,25 @@
 namespace preppy::procedures {
 
    /**
-    * @brief Class implementing Vivification as a procedure
+    * @brief Occurrence Simplification Algorithm
     * 
     * @details For the original algorithm see: https://www.cril.univ-artois.fr/KC/documents/lagniez-marquis-aaai14.pdf
     * Application of this procedure will result in an equivalent output fourmla
     */
-   class Vivification
+   class OccurrenceSimplification
       : public preppy::procedures::Procedure {
    public:
 
       /**
-       * @brief Construct a new Vivification procedure
+       * @brief Construct a new Occurrence Simplification procedure
        * 
        */
-      Vivification();
+      OccurrenceSimplification();
 
    protected:
 
       /**
-       * @brief Apply the Vivification procedure to a formula
+       * @brief Apply the Occurrence Simplification procedure to a formula
        * 
        * @param formula The formula to apply to
        * @return bool True on success

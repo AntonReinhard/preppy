@@ -21,7 +21,7 @@ namespace preppy::util {
 
    CommandLineParser::CommandLineParser() {
       argp_program_version_hook = CommandLineParser::printVersion;
-      CommandLineParser::args.logLevel = log::WARNING;
+      CommandLineParser::args.logLevel = log::LOG_LEVEL::WARNING;
       CommandLineParser::args.force = false;
    }
 
@@ -46,7 +46,7 @@ namespace preppy::util {
          std::istringstream ss(arg);
          int i;
          ss >> i;
-         if (ss.fail() || i < 0 || i > log::DEBUG) {
+         if (ss.fail() || i < 0 || i > static_cast<int>(log::LOG_LEVEL::DEBUG)) {
             return 1;
          }
          arguments->logLevel = static_cast<log::LOG_LEVEL>(i);

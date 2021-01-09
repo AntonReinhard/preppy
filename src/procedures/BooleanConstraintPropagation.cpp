@@ -10,14 +10,19 @@
  */
 
 #include "BooleanConstraintPropagation.h"
+#include "../CNF.h"
+#include "../definitions.h"
 
 #include <algorithm>
 
 namespace preppy::procedures {
 
-   bool BooleanConstraintPropagation::apply(cnf::CNF& formula) {
-      formula.addProcedure("Boolean Constraint Propagation");
+   BooleanConstraintPropagation::BooleanConstraintPropagation()
+      : Procedure("Boolean Constraint Propagation", cnf::EQUIVALENCE_TYPE::SAT_EQUIVALENT) {
 
+   }
+
+   bool BooleanConstraintPropagation::impl(cnf::CNF& formula) {
       // Unit propagation -> find unit clauses
       cnf::Literals units = this->getBcp(formula);
 

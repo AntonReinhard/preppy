@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "Procedures.h"
+#include "Procedure.h"
 #include "../solvers/Solver.h"
 #include "../definitions.h"
 
@@ -23,6 +23,8 @@ namespace preppy::procedures {
    /**
     * @brief Class implementing Backbone Simplification as a procedure
     * 
+    * @details For the original algorithm see: https://www.cril.univ-artois.fr/KC/documents/lagniez-marquis-aaai14.pdf
+    * Application of this procedure will result in an equivalent output fourmla
     */
    class BackboneSimplification
       : public Procedure {
@@ -36,14 +38,6 @@ namespace preppy::procedures {
       BackboneSimplification(std::shared_ptr<solvers::Solver> solver);
 
       /**
-       * @brief Apply Backbone Simplification to a formula
-       * 
-       * @param formula The formula to apply to
-       * @return bool True on success
-       */
-      bool apply(cnf::CNF& formula) override;
-
-      /**
        * @brief Computes a backbone
        * 
        * @param formula The formula to get the backbone for 
@@ -52,8 +46,15 @@ namespace preppy::procedures {
       cnf::Literals getBackbone(const cnf::CNF& formula) const;
 
    protected:
-
    
+      /**
+       * @brief Apply Backbone Simplification to a formula
+       * 
+       * @param formula The formula to apply to
+       * @return bool True on success
+       */
+      bool impl(cnf::CNF& formula) override;
+
    private:
 
       /**

@@ -36,7 +36,7 @@ namespace preppy::util {
    std::shared_ptr<solvers::Solver> Utility::solver = nullptr;
    clock::duration Utility::solvingTimeout = std::chrono::seconds(5);
 
-   log::LOG_LEVEL Utility::GLOBAL_LOG_LEVEL = log::WARNING;
+   log::LOG_LEVEL Utility::GLOBAL_LOG_LEVEL = log::LOG_LEVEL::WARNING;
 
    std::map<std::string, util::clock::time_point> Utility::timerStartPoints;
 

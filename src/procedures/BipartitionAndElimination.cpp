@@ -19,15 +19,13 @@
 
 namespace preppy::procedures {
 
-   BipartitionAndElimination::BipartitionAndElimination() {
-      util::Utility::logOutput("Created Bipartition and Elimination procedure");
+   BipartitionAndElimination::BipartitionAndElimination() 
+      : Procedure("Bipartition and Elimination", cnf::EQUIVALENCE_TYPE::NUMBER_EQUIVALENT) {
+
    }
 
-   bool BipartitionAndElimination::apply(cnf::CNF& formula) {
-      formula.addProcedure("Bipartition And Elimination");
-
+   bool BipartitionAndElimination::impl(cnf::CNF& formula) {
       cnf::Variables outputVariables = this->bipartition(formula);
-
       this->eliminate(formula, outputVariables);
 
       return true;

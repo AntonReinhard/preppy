@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "Procedures.h"
+#include "Procedure.h"
 #include "../CNF.h"
 #include "../definitions.h"
 
@@ -23,6 +23,8 @@ namespace preppy::procedures {
    /**
     * @brief Class implementing Bipartition and Elimination as a procedure
     * 
+    * @details For the original algorithm see: https://www.cril.univ-artois.fr/kc/documents/definability4mc-fullproof.pdf
+    * Application of this procedure will result in an output formula that has the same number of models as the input
     */
    class BipartitionAndElimination
       : public Procedure {
@@ -35,14 +37,6 @@ namespace preppy::procedures {
       BipartitionAndElimination();
 
       /**
-       * @brief Apply the Bipartition and Elimination procedure to a formula
-       * 
-       * @param formula The formula to apply to
-       * @return bool True on success
-       */
-      bool apply(cnf::CNF& formula) override;
-
-      /**
        * @brief Returns a list of variables in the formula that are defined in terms of the other variables in the formula greedily calculated, so not necessarily all are found
        * 
        * @param formula The formula to get a bipartition from
@@ -52,6 +46,14 @@ namespace preppy::procedures {
       cnf::Variables bipartition(const cnf::CNF& formula) const;
 
    protected:
+
+      /**
+       * @brief Apply the Bipartition and Elimination procedure to a formula
+       * 
+       * @param formula The formula to apply to
+       * @return bool True on success
+       */
+      bool impl(cnf::CNF& formula) override;
 
       /**
        * @brief Eliminates the given variables from the formula

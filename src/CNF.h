@@ -204,6 +204,14 @@ namespace preppy::cnf {
       void addProcedure(const std::string& procedure);
 
       /**
+       * @brief Set the Equivalence Type of this formula. Will only set if the Equivalence 
+       * to set is less strong than the one already in place
+       * 
+       * @param eqType The equivalence to set
+       */
+      void setEquivalence(cnf::EQUIVALENCE_TYPE eqType);
+
+      /**
        * @brief Adds a given duration to this CNFs total processing time
        * 
        * @param duration The duration to add
@@ -285,6 +293,13 @@ namespace preppy::cnf {
       std::filesystem::path source;
 
       /**
+       * @brief Saves the Equivalence to the originally read formula. Will start at EQUIVALENT, and
+       * then potentially degrade as procedures are applied.
+       * 
+       */
+      EQUIVALENCE_TYPE equivalence;
+
+      /**
        * @brief The total time this CNF was processed by a procedure
        * 
        */
@@ -326,6 +341,15 @@ namespace preppy::cnf {
        * 
        */
       std::vector<std::tuple<unsigned, unsigned, bool>> compressionInformation;
+
    };
+
+   /**
+    * @brief Convert an EQUIVALENCE_TYPE from enum to a string
+    * 
+    * @param eqType The enum type to convert
+    * @return std::string The resulting string
+    */
+   std::string equivalenceTypeToString(cnf::EQUIVALENCE_TYPE eqType);
 
 }
