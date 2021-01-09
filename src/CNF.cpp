@@ -250,7 +250,7 @@ namespace preppy::cnf {
       util::Utility::logDebug("Writing CNF to file ", filePath);
 
       if (!force && util::Utility::fileExists(filePath)) {
-         util::Utility::logWarning("File ", filePath, " already exists");
+         util::Utility::logWarning("File ", filePath, " already exists, use -f to force override");
          return false;
       }
 

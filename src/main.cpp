@@ -12,6 +12,7 @@
 #include "CNF.h"
 #include "Clause.h"
 #include "Utility.h"
+#include "CommandLineParser.h"
 #include "solvers/clasp.h"
 #include "procedures/BackboneSimplification.h"
 #include "procedures/BipartitionAndElimination.h"
@@ -25,11 +26,9 @@ using namespace preppy;
 
 int main(const int argc, char** argv) {
 
-   if (!util::Utility::parseCommandLine(argc, argv)) {
-      exit(0);
-   }
+   util::Arguments args = util::Utility::parseCommandLine(argc, argv);
 
-   std::string inputFileName = argv[1];
+   std::string inputFileName = args.fileIn;
 
    util::Utility::init();
 
@@ -64,7 +63,12 @@ int main(const int argc, char** argv) {
    util::Utility::logOutput("CNF has ", variablesPost, " variables (", maxVariablePost, " max), ", clausesPost, " clauses and ", literalsPost, " literals");
    util::Utility::logOutput("Removed ", clausesPre - clausesPost, " clauses and ", literalsPre - literalsPost, " literals");
 
-   testCNF.writeToFile("output/", true);
+   if (args.fileOut.empty()) {
+      testCNF.writeToFile("output/", args.force);
+   }
+   else {
+      testCNF.writeToFile(args.fileOut, args.force);
+   }
 
    util::Utility::cleanup();
 }

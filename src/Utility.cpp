@@ -10,6 +10,7 @@
  */
 
 #include "Utility.h"
+#include "CommandLineParser.h"
 #include "definitions.h"
 #include "solvers/clasp.h"
 
@@ -26,6 +27,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <argp.h>
 
 namespace preppy::util {
 
@@ -55,7 +57,16 @@ namespace preppy::util {
       Utility::logger.reset();
    }
 
-   bool Utility::parseCommandLine(const int argc, char** argv) {
+   Arguments Utility::parseCommandLine(const int argc, char** argv) {
+      CommandLineParser clp;
+      clp.parse(argc, argv);
+
+      Arguments args = clp.getArguments();
+
+      util::Utility::GLOBAL_LOG_LEVEL = args.logLevel;
+
+      return args;
+      /*
       if (argc <= 1) {
          std::cout << "Usage: " << argv[0] << " [input cnf file] [options]" << std::endl;
          return false;
@@ -93,8 +104,7 @@ namespace preppy::util {
             util::Utility::GLOBAL_LOG_LEVEL = log::LOG_LEVEL(tempLogLevel);
          }
       }
-
-      return true;
+*/
    }
 
    std::string Utility::timeToString(const clock::duration time) {

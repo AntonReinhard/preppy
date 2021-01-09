@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
    Logger.cpp
    Utility.cpp
    Model.cpp
+   CommandLineParser.cpp
    solvers/Solver.cpp
    solvers/clasp.cpp
    procedures/BackboneSimplification.cpp

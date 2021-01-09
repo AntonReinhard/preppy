@@ -23,6 +23,8 @@
 
 namespace preppy::util {
 
+   struct Arguments;
+
    /**
     * @brief A class for all sorts of static utility functions
     * 
@@ -48,9 +50,9 @@ namespace preppy::util {
        * 
        * @param argc argc from main
        * @param argv argv from main
-       * @return bool Returns false if an error was encountered and the program should exit
+       * @return Arguments Returns the parsed Arguments object
        */
-      static bool parseCommandLine(const int argc, char** argv);
+      static util::Arguments parseCommandLine(const int argc, char** argv);
 
       /**
        * @brief Takes a duration and formats it as a string as "[ss.mmmm]"

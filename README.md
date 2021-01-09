@@ -10,13 +10,21 @@ Clone the repository and execute `./build.sh` in the repo's root directory. It w
 
 ## Usage
 
-Basic Usage: `./install/bin/preppy [input cnf file] [options]`
-
-Use `./install/bin/preppy -h` for help
+`preppy [OPTION...] <INPUT FILE>`
 
 ### Options
-- `-h`: Get info on how to use preppy
-- `-v <n>`: Setting the log level. 0 means nothing will be logged, 1 means only errors and program output will be logged, 2 means additionally warnings will be logged, 3 and 4 add more debugging info respectively.
+
+  **-f, --force**: Override output files if they already exist
+
+  **-o, --output=\<FILE/DIRECTORY\>**: Set a output file or directory. If a directory is set the output file name will be <inputfilestem>out.cnf
+
+  **-v, -l, --verbose=LOG_LEVEL, --logging=LOG_LEVEL**: Set log level of the application, 0 = NOTHING, 1 = ERROR, 2 = WARNING (default), 3 = INFO, 4 = DEBUG
+
+  **-?, --help**: Give this help list
+
+  **--usage**: Give a short usage message
+
+  **-V, --version**: Print program version
 
 ## Supported Solvers
 

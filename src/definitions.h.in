@@ -11,43 +11,63 @@
 
 #pragma once
 
+#include <argp.h>
+#include <iostream>
 #include <chrono>
 #include <string>
 #include <vector>
 
 namespace preppy::util {
-    /**
-     * @brief The clock used throughout the program
-     * 
-     */
-    typedef std::chrono::steady_clock clock;
+   
+   /**
+    * @brief The clock used throughout the program
+    * 
+    */
+   typedef std::chrono::steady_clock clock;
 
-    /**
-     * @brief The program version
-     * 
-     */
-    const std::string VERSION = "${PREPPY_VERSION}";
+   /**
+    * @brief The program version
+    * 
+    */
+   const std::string VERSION = "${PREPPY_VERSION}";
+
+   /**
+    * @brief The program build type
+    * 
+    */
+   const std::string BUILD_TYPE = "${CMAKE_BUILD_TYPE}";
+   
+   /**
+    * @brief The "header lines" of the program
+    * 
+    */
+   const std::vector<std::string> logoLines = {
+      std::string("preppy v") + util::VERSION + std::string(" Build: ") + BUILD_TYPE,
+      "Copyright (C) Anton Reinhard",
+      "License: The MIT License <https://opensource.org/licenses/MIT>"
+   };
+   
 }
 
 namespace preppy::cnf {
-    typedef std::vector<int> Literals;
-    typedef std::vector<unsigned> Variables;
-    class Clause;
-    typedef std::vector<cnf::Clause> Clauses;
+   typedef std::vector<int> Literals;
+   typedef std::vector<unsigned> Variables;
+   class Clause;
+   typedef std::vector<cnf::Clause> Clauses;
 }
 
 namespace preppy::log {
- 
-    /**
-     * @brief The logging level, specifies what will be logged and what won't
-     * 
-     */
-    enum LOG_LEVEL {
-        NOTHING = 0,
-        ERROR   = 1,
-        WARNING = 2,
-        INFO    = 3,
-        DEBUG   = 4
-    };
+
+   /**
+    * @brief The logging level, specifies what will be logged and what won't
+    * 
+    */
+   enum LOG_LEVEL {
+      NOTHING = 0,
+      ERROR   = 1,
+      WARNING = 2,
+      INFO    = 3,
+      DEBUG   = 4
+   };
 
 }
