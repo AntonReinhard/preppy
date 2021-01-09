@@ -24,6 +24,8 @@ namespace preppy::procedures {
    }
 
    bool BipartitionAndElimination::apply(cnf::CNF& formula) {
+      formula.addProcedure("Bipartition And Elimination");
+
       cnf::Variables outputVariables = this->bipartition(formula);
 
       this->eliminate(formula, outputVariables);

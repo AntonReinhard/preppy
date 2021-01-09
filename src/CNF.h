@@ -15,6 +15,7 @@
 #include "definitions.h"
 
 #include <vector>
+#include <set>
 #include <filesystem>
 #include <initializer_list>
 #include <tuple>
@@ -139,6 +140,13 @@ namespace preppy::cnf {
       bool writeToFile(const std::string& filepath, const bool force = false);
 
       /**
+       * @brief Helper function for writing the File
+       * 
+       * @return std::string The header of the output cnf file
+       */
+      std::string getFileHeader();
+
+      /**
        * @brief Returns the amount of variables in the formula
        * 
        * @return unsigned The number of distinct used variables in this formula
@@ -187,6 +195,20 @@ namespace preppy::cnf {
        * @return std::vector<unsigned> The vector containing variable occurrence counts
        */
       std::vector<unsigned> countVariables();
+
+      /**
+       * @brief Add the name of a procedure that was used on this CNF
+       * 
+       * @param procedure The procedure to add
+       */
+      void addProcedure(const std::string& procedure);
+
+      /**
+       * @brief Adds a given duration to this CNFs total processing time
+       * 
+       * @param duration The duration to add
+       */
+      void addProcessingTime(const util::clock::duration& duration);
 
 #pragma region vectorfunctions
 
@@ -261,6 +283,18 @@ namespace preppy::cnf {
        * 
        */
       std::filesystem::path source;
+
+      /**
+       * @brief The total time this CNF was processed by a procedure
+       * 
+       */
+      util::clock::duration totalProcessingTime;
+
+      /**
+       * @brief A set of procedures that were used on this CNF
+       * 
+       */
+      std::set<std::string> procedures;
 
       /**
        * @brief Number of variables in this formula, stored so it does not need to be recalculated every time it is asked

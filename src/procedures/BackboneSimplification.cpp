@@ -27,6 +27,8 @@ namespace preppy::procedures {
    }
 
    bool BackboneSimplification::apply(cnf::CNF& formula) {
+      formula.addProcedure("Backbone Simplification");
+
       cnf::Literals backbone = this->getBackbone(formula);
 
       const uint64_t variablesWithoutBackbone = formula.getVariables() - backbone.size();

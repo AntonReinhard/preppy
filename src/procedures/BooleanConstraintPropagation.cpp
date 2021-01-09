@@ -16,6 +16,8 @@
 namespace preppy::procedures {
 
    bool BooleanConstraintPropagation::apply(cnf::CNF& formula) {
+      formula.addProcedure("Boolean Constraint Propagation");
+
       // Unit propagation -> find unit clauses
       cnf::Literals units = this->getBcp(formula);
 

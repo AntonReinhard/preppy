@@ -52,8 +52,10 @@ int main(const int argc, char** argv) {
       util::Utility::logOutput("CNF has ", variablesPre, " variables (", maxVariablePre, " max) after compression");
    }
 
+   util::Utility::startTimer("vivification");
    procedures::Vivification procedure;
    procedure.apply(testCNF);
+   testCNF.addProcessingTime(util::Utility::stopTimer("vivification"));
 
    auto variablesPost = testCNF.getVariables();
    auto maxVariablePost = testCNF.getMaxVariable();

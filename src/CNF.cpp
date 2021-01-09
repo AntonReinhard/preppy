@@ -23,14 +23,16 @@ namespace preppy::cnf {
 
    CNF::CNF() 
       : variablesDirtyBit(true) 
-      , maxVariableDirtyBit(true){
+      , maxVariableDirtyBit(true)
+      , totalProcessingTime(0) {
 
    }
 
    CNF::CNF(std::initializer_list<Clauses::value_type> l)
       : clauses(l)
       , variablesDirtyBit(true)
-      , maxVariableDirtyBit(true) {
+      , maxVariableDirtyBit(true)
+      , totalProcessingTime(0) {
 
    }
 
@@ -38,6 +40,8 @@ namespace preppy::cnf {
       CNF copy;
       copy.name = this->name;
       copy.source = this->source;
+      copy.totalProcessingTime = this->totalProcessingTime;
+      copy.procedures = this->procedures;
       return copy;
    }
 
@@ -265,15 +269,43 @@ namespace preppy::cnf {
          return false;
       }
 
-      // write header
-      file << "c " << this->name << std::endl;
-      file << "p cnf " << this->getMaxVariable() << " " << this->size() << std::endl;
+      file << this->getFileHeader();
+
       for (const auto& clause : *this) {
          file << clause.toCNFLine();
       }
 
       file.close();
       return true;
+   }
+
+   std::string CNF::getFileHeader() {
+      std::stringstream ss;
+      
+      ss << "c " << this->name << "\n";
+      ss << "c Processed by preppy v" << util::VERSION << " Type: " << util::BUILD_TYPE << "\n";
+      ss << "c Processing took " << util::Utility::durationToString(this->totalProcessingTime) << "\n";
+      ss << "c Used Procedures: ";
+
+      if (this->procedures.empty()) {
+         ss << "None";
+      }
+      else {
+         // write comma seperated procedure names
+         unsigned i = 0;
+         for (const auto& proc : this->procedures) {
+            ++i;
+            ss << "\"" << proc << "\"";
+            if (i < this->procedures.size()) {
+               ss << ", ";
+            }
+         }
+      }
+
+      // actual header line
+      ss << "\np cnf " << this->getMaxVariable() << " " << this->size() << "\n";
+
+      return ss.str();
    }
 
    unsigned CNF::getVariables() {
@@ -336,6 +368,14 @@ namespace preppy::cnf {
       }
 
       return varCount;
+   }
+
+   void CNF::addProcedure(const std::string& procedure) {
+      this->procedures.insert(procedure);
+   }
+
+   void CNF::addProcessingTime(const util::clock::duration& duration) {
+      this->totalProcessingTime += duration;
    }
 
 #pragma region vectorfunctions
