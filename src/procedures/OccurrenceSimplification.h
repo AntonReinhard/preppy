@@ -43,6 +43,14 @@ namespace preppy::procedures {
 
    private:
 
+      /**
+       * @brief Get the Literals in the given formula sorted by their number of occurrences in the formula
+       * 
+       * @param formula The formula to get the literals from
+       * @return cnf::Literals The literals, sorted by their number of occurrence. Most common to least common
+       */
+      cnf::Literals getIncidenceSortedLiterals(cnf::CNF& formula) const;
+
    };
 
 }

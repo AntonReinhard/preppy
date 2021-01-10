@@ -32,29 +32,16 @@ namespace preppy::procedures {
       return true;
    }
 
-   cnf::Literals BooleanConstraintPropagation::getBcp(cnf::CNF& formula) const {
-      cnf::CNF workingFormula{formula};
+   cnf::Literals BooleanConstraintPropagation::getBcp(cnf::CNF& formula) {
+      this->reset();
+      this->initWatchedLiterals(formula);
 
-      // saves pointers to clauses, each clause is in here exactly twice (except for unit clauses)
-      // index 2l points is for literal -l, index 2l + 1 for literal l
-      std::vector<std::vector<cnf::Clause*>> watchedLiterals(2 * (formula.getMaxVariable() + 2));
       // Unit propagation -> find unit clauses
       cnf::Literals units;
-      for (auto& clause : formula) {
+      for (const auto& clause : formula) {
          if (clause.size() == 1) {
             units.push_back(clause[0]);
-            continue;
          }
-         if (clause.size() == 0) {
-            // unsatisfiable
-            return {0};
-         }
-
-         //if there's at least 2 literals, add the first two literals of the clause to the watched literals
-         size_t index = std::abs(2 * clause[0]) + (clause[0] > 0);
-         watchedLiterals.at(index).push_back(&clause);
-         index = std::abs(2 * clause[1]) + (clause[1] > 0);
-         watchedLiterals.at(index).push_back(&clause);
       }
       
       if (units.empty()) {
@@ -64,19 +51,19 @@ namespace preppy::procedures {
       for (size_t i = 0; i < units.size(); ++i) {
          auto literal = units[i];
          size_t index = std::abs(2 * literal) + (literal < 0);  // use < here because the negated literal needs to be checked now
-         std::vector<cnf::Clause*>& watched = watchedLiterals.at(index);
+         std::vector<cnf::Clause*>& watched = watchedLiterals[index];
 
          for (auto& clause : watched) {
-            // check if we produced a unit clause
-            cnf::Clause partialClause = clause->getPartialClause(units);
-            if (partialClause.size() == 0) {
-               // clause is empty -> clause is unsatisfied
-               return {0};
+            // check if the clause is satisfied
+            if (clause->isSatisfied(units)) {
+               continue;
             }
+
+            auto partialClause = clause->getPartialClause(units);
             if (partialClause.size() == 1) {
-               // check if the clause was satisfied
+               // formula became unsatisfiable
                if (partialClause[0] == 0) {
-                  continue;   // clause was satisfied, continue
+                  return {0};
                }
                // new unit clause -> add to units
                // do nothing else since if we come across the same clause again it will be satisfied and not get here
@@ -86,8 +73,8 @@ namespace preppy::procedures {
                // there's 2 or more literals
                // choose a new literal to watch
                // we always watch the first two, so without the one currently being propagated, start watching the second now
-               size_t newIndex = std::abs(2 * partialClause.at(1)) + (partialClause.at(1) > 0);
-               watchedLiterals.at(newIndex).push_back(clause);
+               size_t newIndex = std::abs(2 * partialClause[1]) + (partialClause[1] > 0);
+               watchedLiterals[newIndex].push_back(clause);
             }
          }
       }
@@ -122,6 +109,28 @@ namespace preppy::procedures {
    void BooleanConstraintPropagation::applyLiteralsEq(cnf::CNF& formula, const cnf::Literals& literals) const {
       for (const auto& literal : literals) {
          this->applySingleLiteralEq(formula, literal);
+      }
+   }
+
+   void BooleanConstraintPropagation::reset() {
+      this->watchedLiterals.clear();
+   }
+
+   void BooleanConstraintPropagation::initWatchedLiterals(cnf::CNF& formula) {
+      // 2l points is for literal -l, index 2l + 1 for literal l
+      this->watchedLiterals.resize(2 * (formula.getMaxVariable() + 2));
+
+      for (auto& clause : formula) {
+         if (clause.size() <= 1) {
+            // nothing to be done
+            continue;
+         }
+
+         //if there's at least 2 literals, add the first two literals of the clause to the watched literals
+         size_t index = std::abs(2 * clause[0]) + (clause[0] > 0);
+         watchedLiterals[index].push_back(&clause);
+         index = std::abs(2 * clause[1]) + (clause[1] > 0);
+         watchedLiterals[index].push_back(&clause);
       }
    }
 

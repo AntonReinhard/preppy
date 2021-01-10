@@ -21,6 +21,7 @@ namespace preppy::cnf {
 
    /**
     * @brief Representing a Clause, consisting of literals represented by numbers. Negative number means the literal is negated.
+    * A unsatisfied clause is represented by {0}
     * 
     */
    class Clause {
@@ -47,20 +48,43 @@ namespace preppy::cnf {
       explicit Clause(const std::string& line);
 
       /**
+       * @brief Simple helper function to check whether this clause contains a given literal
+       * 
+       * @param literal The literal to check whether it's part of the clause
+       * @return bool True if the literal is part of the clause
+       */
+      bool containsLiteral(int literal) const;
+
+      /**
        * @brief Sets the given literal to true, removes it from the clause if it's negated
        * 
        * @param literal The literal to set
        * @return bool True if the clause is satisfied afterwards
        */
-      bool setLiteral(const int literal);
+      bool setLiteral(int literal);
 
       /**
        * @brief Returns this clause when the given literals are applied as facts to it
        * 
        * @param literals The literals to apply
-       * @return cnf::Clause The resulting clause, {0} if satisfied
+       * @return cnf::Clause The resulting clause, {0} if unsatisfied
        */
       cnf::Clause getPartialClause(const cnf::Literals& literals) const;
+
+      /**
+       * @brief Returns true if the clause is satisfied when setting the given literals
+       * 
+       * @param literals The literals to set
+       * @return bool True iff the clause is satisfied with the given literals
+       */
+      bool isSatisfied(const cnf::Literals& literals) const;
+
+      /**
+       * @brief Gets the complementary clause of this clause, meaning every literal is negated
+       * 
+       * @return cnf::Clause The complementary clause
+       */
+      cnf::Clause getComplement() const;
 
       /**
        * @brief Renames the literals in the clause from old to new
@@ -92,53 +116,119 @@ namespace preppy::cnf {
       unsigned getMaxVariable() const;
 
 #pragma region vectorfunctions
+   //Put function definitions here for compiler optimizations and inlining
 
-      // exposing vector member functions for literals
-      // access
-      Literals::iterator begin() noexcept;
-      Literals::const_iterator begin() const noexcept;
-      Literals::iterator end() noexcept;
-      Literals::const_iterator end() const noexcept;
-      Literals::reference front();
-      Literals::const_reference front() const;
-      Literals::reference back();
-      Literals::const_reference back() const;
-      Literals::reference operator[](Literals::size_type n);
-      Literals::const_reference operator[](Literals::size_type n) const;
-      Literals::reference at(const Literals::size_type n);
-      Literals::const_reference at(const Literals::size_type n) const;
+   Literals::iterator begin() noexcept {
+      return this->literals.begin();
+   }
 
-      // muting
-      void push_back(const Literals::value_type& val);
-      void push_back(Literals::value_type&& val);
-      template <class... Args>
-      Literals::iterator emplace(Literals::const_iterator position, Args&&... args) {
-         return this->literals.emplace(position, args...);
-      }
-      template <class... Args>
-      void emplace_back(Args&&... args) {
-         this->literals.emplace_back(args...);
-      }
-      void pop_back();
-      Literals::iterator erase(Literals::const_iterator position);
-      Literals::iterator erase(Literals::const_iterator first, Literals::const_iterator last);
-      Literals::iterator insert(Literals::const_iterator position, const Literals::value_type& val);
-      Literals::iterator insert(Literals::const_iterator position, Literals::size_type n, const Literals::value_type& val);
-      template <class InputIterator>
-      Literals::iterator insert(Literals::const_iterator position, InputIterator first, InputIterator last) {
-         return this->literals.insert(position, first, last);
-      }
-      Literals::iterator insert(Literals::const_iterator position, Literals::value_type&& val);
-      Literals::iterator insert(Literals::const_iterator position, std::initializer_list<Literals::value_type> il);
-      void clear() noexcept;
+   Literals::const_iterator begin() const noexcept {
+      return this->literals.begin();
+   }
 
-      // size
-      void reserve(Literals::size_type n);
-      Literals::size_type capacity() const noexcept;
-      void resize(Literals::size_type n);
-      void resize(Literals::size_type n, const Literals::value_type& val);
-      Literals::size_type size() const noexcept;
-      Literals::size_type max_size() const noexcept;
+   Literals::iterator end() noexcept {
+      return this->literals.end();
+   }
+
+   Literals::const_iterator end() const noexcept {
+      return this->literals.end();
+   }
+   
+   Literals::reference front() {
+      return this->literals.front();
+   }
+
+   Literals::const_reference front() const {
+      return this->literals.front();
+   }
+
+   Literals::reference back() {
+      return this->literals.back();
+   }
+   
+   Literals::const_reference back() const {
+      return this->literals.back();
+   }
+   
+   Literals::reference operator[](Literals::size_type n) {
+      return this->literals[n];
+   }
+
+   Literals::const_reference operator[](Literals::size_type n) const {
+      return this->literals[n];
+   }
+   
+   Literals::reference at(const Literals::size_type n) {
+      return this->literals.at(n);
+   }
+
+   Literals::const_reference at(const Literals::size_type n) const {
+      return this->literals.at(n);
+   }
+
+   void push_back(const Literals::value_type& val) {
+      this->literals.push_back(val);
+   }
+
+   void push_back(Literals::value_type&& val) {
+      this->literals.push_back(val);
+   }
+
+   void pop_back() {
+      this->literals.pop_back();
+   }
+
+   Literals::iterator erase(Literals::const_iterator position) {
+      return this->literals.erase(position);
+   }
+
+   Literals::iterator erase(Literals::const_iterator first, Literals::const_iterator last) {
+      return this->literals.erase(first, last);
+   }
+
+   Literals::iterator insert(Literals::const_iterator position, const Literals::value_type& val) {
+      return this->literals.insert(position, val);
+   }
+
+   Literals::iterator insert(Literals::const_iterator position, Literals::size_type n, const Literals::value_type& val) {
+      return this->literals.insert(position, n, val);
+   }
+
+   Literals::iterator insert(Literals::const_iterator position, Literals::value_type&& val) {
+      return this->literals.insert(position, val);
+   }
+
+   Literals::iterator insert(Literals::const_iterator position, std::initializer_list<Literals::value_type> il) {
+      return this->literals.insert(position, il);
+   }
+
+   void clear() noexcept {
+      this->literals.clear();
+   }
+
+   void reserve(Literals::size_type n) {
+      this->literals.reserve(n);
+   }
+
+   Literals::size_type capacity() const noexcept {
+      return this->literals.capacity();
+   }
+
+   void resize(Literals::size_type n) {
+      this->literals.resize(n);
+   }
+
+   void resize(Literals::size_type n, const Literals::value_type& val) {
+      this->literals.resize(n, val);
+   }
+
+   Literals::size_type size() const noexcept {
+      return this->literals.size();
+   }
+
+   Literals::size_type max_size() const noexcept {
+      return this->literals.max_size();
+   }
 
 #pragma endregion vectorfunctions
 

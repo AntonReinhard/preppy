@@ -41,20 +41,28 @@ namespace preppy::cnf {
       }
    }
 
+   bool Clause::containsLiteral(const int literal) const {
+      return std::find(this->begin(), this->end(), literal) != this->end();
+   }
+
    bool Clause::setLiteral(const int literal) {
-      for (const auto& lit : *this) {
-         if (lit == literal) {
-            return true;
-         }
+      // if the literal is found -> the clause is satisfied
+      if (std::find(this->begin(), this->end(), literal) != this->end()) {
+         this->literals = {};
+         return true;
       }
-      this->erase(
-         std::remove_if(this->begin(), this->end(),
-            [&](const int lit) {
-               return lit == -literal;
-            }
-         ),
-         this->end()
-      );
+
+      // if the negated literal is found -> remove that literal
+      auto litPos = std::find(this->begin(), this->end(), -literal);
+      if (litPos != this->end()) {
+         this->erase(litPos);
+      }
+
+      // if the last literal was just set to false this clause is now unsatisfied
+      if (this->size() == 0) {
+         this->literals = {0};
+      }
+
       return false;
    }
 
@@ -62,10 +70,28 @@ namespace preppy::cnf {
       cnf::Clause result(*this);
       for (const auto& lit : literals) {
          if (result.setLiteral(lit)) {
-            return {0};
+            return result;
          }
       }
       return result;
+   }
+
+   bool Clause::isSatisfied(const cnf::Literals& literals) const {
+      for (const auto& lit : this->literals) {
+         if (std::find(literals.begin(), literals.end(), lit) != literals.end()) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+   cnf::Clause Clause::getComplement() const {
+      cnf::Clause complementaryNewClause;
+      complementaryNewClause.reserve(this->size());
+      for (const auto &lit : this->literals) {
+         complementaryNewClause.push_back(-lit);
+      }
+      return complementaryNewClause;
    }
 
    void Clause::renameVariable(const unsigned oldVar, const unsigned newVar) {
@@ -107,121 +133,5 @@ namespace preppy::cnf {
       }
       return max;
    }
-
-#pragma region vectorfunctions
-
-   Literals::iterator Clause::begin() noexcept {
-      return this->literals.begin();
-   }
-
-   Literals::const_iterator Clause::begin() const noexcept {
-      return this->literals.begin();
-   }
-
-   Literals::iterator Clause::end() noexcept {
-      return this->literals.end();
-   }
-
-   Literals::const_iterator Clause::end() const noexcept {
-      return this->literals.end();
-   }
-   
-   Literals::reference Clause::front() {
-      return this->literals.front();
-   }
-
-   Literals::const_reference Clause::front() const {
-      return this->literals.front();
-   }
-
-   Literals::reference Clause::back() {
-      return this->literals.back();
-   }
-   
-   Literals::const_reference Clause::back() const {
-      return this->literals.back();
-   }
-   
-   Literals::reference Clause::operator[](Literals::size_type n) {
-      return this->literals[n];
-   }
-
-   Literals::const_reference Clause::operator[](Literals::size_type n) const {
-      return this->literals[n];
-   }
-   
-   Literals::reference Clause::at(const Literals::size_type n) {
-      return this->literals.at(n);
-   }
-
-   Literals::const_reference Clause::at(const Literals::size_type n) const {
-      return this->literals.at(n);
-   }
-
-   void Clause::push_back(const Literals::value_type& val) {
-      this->literals.push_back(val);
-   }
-
-   void Clause::push_back(Literals::value_type&& val) {
-      this->literals.push_back(val);
-   }
-
-   void Clause::pop_back() {
-      this->literals.pop_back();
-   }
-
-   Literals::iterator Clause::erase(Literals::const_iterator position) {
-      return this->literals.erase(position);
-   }
-
-   Literals::iterator Clause::erase(Literals::const_iterator first, Literals::const_iterator last) {
-      return this->literals.erase(first, last);
-   }
-
-   Literals::iterator Clause::insert(Literals::const_iterator position, const Literals::value_type& val) {
-      return this->literals.insert(position, val);
-   }
-
-   Literals::iterator Clause::insert(Literals::const_iterator position, Literals::size_type n, const Literals::value_type& val) {
-      return this->literals.insert(position, n, val);
-   }
-
-   Literals::iterator Clause::insert(Literals::const_iterator position, Literals::value_type&& val) {
-      return this->literals.insert(position, val);
-   }
-
-   Literals::iterator Clause::insert(Literals::const_iterator position, std::initializer_list<Literals::value_type> il) {
-      return this->literals.insert(position, il);
-   }
-
-   void Clause::clear() noexcept {
-      this->literals.clear();
-   }
-
-   void Clause::reserve(Literals::size_type n) {
-      this->literals.reserve(n);
-   }
-
-   Literals::size_type Clause::capacity() const noexcept {
-      return this->literals.capacity();
-   }
-
-   void Clause::resize(Literals::size_type n) {
-      this->literals.resize(n);
-   }
-
-   void Clause::resize(Literals::size_type n, const Literals::value_type& val) {
-      this->literals.resize(n, val);
-   }
-
-   Literals::size_type Clause::size() const noexcept {
-      return this->literals.size();
-   }
-
-   Literals::size_type Clause::max_size() const noexcept {
-      return this->literals.max_size();
-   }
-
-#pragma endregion vectorfunctions
 
 }

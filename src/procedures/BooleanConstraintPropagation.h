@@ -13,6 +13,8 @@
 
 #include "Procedure.h"
 
+#include <vector>
+
 namespace preppy::procedures {
 
    /**
@@ -35,7 +37,7 @@ namespace preppy::procedures {
        * @param formula The formula to get the propagated literals from
        * @return cnf::Literals The derived literals, or {0} if the formula became unsatisfiable
        */
-      cnf::Literals getBcp(cnf::CNF& formula) const;
+      cnf::Literals getBcp(cnf::CNF& formula);
 
       /**
        * @brief Applies boolean constraint propagation on the formula with a single literal
@@ -69,6 +71,12 @@ namespace preppy::procedures {
        */
       void applyLiteralsEq(cnf::CNF& formula, const cnf::Literals& literals) const;
 
+      /**
+       * @brief Resets everything that is cached. Should call before using with a completely different formula
+       * 
+       */
+      void reset();
+
    protected:
 
       /**
@@ -79,8 +87,20 @@ namespace preppy::procedures {
        */
       bool impl(cnf::CNF& formula) override;
 
+      /**
+       * @brief 
+       * 
+       * @param formula 
+       */
+      void initWatchedLiterals(cnf::CNF& formula);
+
    private:
 
+      /**
+       * @brief Saves pointers to clauses, each clause is in here exactly twice (except for unit clauses)
+       * 
+       */
+      std::vector<std::vector<cnf::Clause*>> watchedLiterals;
 
    };
 

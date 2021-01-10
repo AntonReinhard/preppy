@@ -219,53 +219,119 @@ namespace preppy::cnf {
       void addProcessingTime(const util::clock::duration& duration);
 
 #pragma region vectorfunctions
+   //Put function definitions here for compiler optimizations and inlining
 
-      // exposing vector member functions for clauses
-      // access
-      Clauses::iterator begin() noexcept;
-      Clauses::const_iterator begin() const noexcept;
-      Clauses::iterator end() noexcept;
-      Clauses::const_iterator end() const noexcept;
-      Clauses::reference front();
-      Clauses::const_reference front() const;
-      Clauses::reference back();
-      Clauses::const_reference back() const;
-      Clauses::reference operator[](Clauses::size_type n);
-      Clauses::const_reference operator[](Clauses::size_type n) const;
-      Clauses::reference at(const Clauses::size_type n);
-      Clauses::const_reference at(const Clauses::size_type n) const;
+   Clauses::iterator begin() noexcept {
+      return this->clauses.begin();
+   }
 
-      // muting
-      void push_back(const Clauses::value_type& val);
-      void push_back(Clauses::value_type&& val);
-      template <class... Args>
-      Clauses::iterator emplace(Clauses::const_iterator position, Args&&... args) {
-         return this->clauses.emplace(position, args...);
-      }
-      template <class... Args>
-      void emplace_back(Args&&... args) {
-         this->clauses.emplace_back(args...);
-      }
-      void pop_back();
-      Clauses::iterator erase(Clauses::const_iterator position);
-      Clauses::iterator erase(Clauses::const_iterator first, Clauses::const_iterator last);
-      Clauses::iterator insert(Clauses::const_iterator position, const Clauses::value_type& val);
-      Clauses::iterator insert(Clauses::const_iterator position, Clauses::size_type n, const Clauses::value_type& val);
-      template <class InputIterator>
-      Clauses::iterator insert(Clauses::const_iterator position, InputIterator first, InputIterator last) {
-         return this->clauses.insert(position, first, last);
-      }
-      Clauses::iterator insert(Clauses::const_iterator position, Clauses::value_type&& val);
-      Clauses::iterator insert(Clauses::const_iterator position, std::initializer_list<Clauses::value_type> il);
-      void clear() noexcept;
+   Clauses::const_iterator begin() const noexcept {
+      return this->clauses.begin();
+   }
 
-      // size
-      void reserve(Clauses::size_type n);
-      Clauses::size_type capacity() const noexcept;
-      void resize(Clauses::size_type n);
-      void resize(Clauses::size_type n, const Clauses::value_type& val);
-      Clauses::size_type size() const noexcept;
-      Clauses::size_type max_size() const noexcept;
+   Clauses::iterator end() noexcept {
+      return this->clauses.end();
+   }
+
+   Clauses::const_iterator end() const noexcept {
+      return this->clauses.end();
+   }
+   
+   Clauses::reference front() {
+      return this->clauses.front();
+   }
+
+   Clauses::const_reference front() const {
+      return this->clauses.front();
+   }
+
+   Clauses::reference back() {
+      return this->clauses.back();
+   }
+   
+   Clauses::const_reference back() const {
+      return this->clauses.back();
+   }
+   
+   Clauses::reference operator[](Clauses::size_type n) {
+      return this->clauses[n];
+   }
+
+   Clauses::const_reference operator[](Clauses::size_type n) const {
+      return this->clauses[n];
+   }
+   
+   Clauses::reference at(const Clauses::size_type n) {
+      return this->clauses.at(n);
+   }
+
+   Clauses::const_reference at(const Clauses::size_type n) const {
+      return this->clauses.at(n);
+   }
+
+   void push_back(const Clauses::value_type& val) {
+      this->clauses.push_back(val);
+   }
+
+   void push_back(Clauses::value_type&& val) {
+      this->clauses.push_back(val);
+   }
+
+   void pop_back() {
+      this->clauses.pop_back();
+   }
+
+   Clauses::iterator erase(Clauses::const_iterator position) {
+      return this->clauses.erase(position);
+   }
+
+   Clauses::iterator erase(Clauses::const_iterator first, Clauses::const_iterator last) {
+      return this->clauses.erase(first, last);
+   }
+
+   Clauses::iterator insert(Clauses::const_iterator position, const Clauses::value_type& val) {
+      return this->clauses.insert(position, val);
+   }
+
+   Clauses::iterator insert(Clauses::const_iterator position, Clauses::size_type n, const Clauses::value_type& val) {
+      return this->clauses.insert(position, n, val);
+   }
+
+   Clauses::iterator insert(Clauses::const_iterator position, Clauses::value_type&& val) {
+      return this->clauses.insert(position, val);
+   }
+
+   Clauses::iterator insert(Clauses::const_iterator position, std::initializer_list<Clauses::value_type> il) {
+      return this->clauses.insert(position, il);
+   }
+
+   void clear() noexcept {
+      this->clauses.clear();
+   }
+
+   void reserve(Clauses::size_type n) {
+      this->clauses.reserve(n);
+   }
+
+   Clauses::size_type capacity() const noexcept {
+      return this->clauses.capacity();
+   }
+
+   void resize(Clauses::size_type n) {
+      this->clauses.resize(n);
+   }
+
+   void resize(Clauses::size_type n, const Clauses::value_type& val) {
+      this->clauses.resize(n, val);
+   }
+
+   Clauses::size_type size() const noexcept {
+      return this->clauses.size();
+   }
+
+   Clauses::size_type max_size() const noexcept {
+      return this->clauses.max_size();
+   }
 
 #pragma endregion vectorfunctions
 

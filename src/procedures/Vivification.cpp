@@ -11,6 +11,7 @@
 
 #include "Vivification.h"
 #include "BooleanConstraintPropagation.h"
+#include "../Utility.h"
 
 #include <algorithm>
 
@@ -26,6 +27,9 @@ namespace preppy::procedures {
 
       procedures::BooleanConstraintPropagation bcp;
 
+      int totalBcpCalls = 0;
+      util::clock::duration bcpDuration(0);
+
       while (formula.size() != 0) {
          // take first clause and delete it from the formula
          cnf::Clause currentClause = formula[0];
@@ -36,7 +40,11 @@ namespace preppy::procedures {
          cnf::CNF tempFormula = formula;
          tempFormula.joinFormula(newFormula);
          // take bcp of formula ∪ newFormula
+
+         util::Utility::startTimer("getBcp");
          auto bcpLiterals = bcp.getBcp(tempFormula);
+         ++totalBcpCalls;
+         bcpDuration += util::Utility::stopTimer("getBcp");
 
          bool satisfied = false;
 
@@ -61,15 +69,17 @@ namespace preppy::procedures {
             // add l to newClause
             newClause.push_back(l);
 
-            // make complementary clause (consisting of all negated literals)
-            cnf::Clause complementaryNewClause;
-            for (const auto &lit : newClause) {
-               complementaryNewClause.push_back(-lit);
-            }
+            // get complementary clause (consisting of all negated literals)
+            cnf::Clause complementaryNewClause = newClause.getComplement();
 
             // take bcp of formula ∪ newFormula
             tempFormula.push_back(complementaryNewClause);
+
+            util::Utility::startTimer("getBcp");
             bcpLiterals = bcp.getBcp(tempFormula);
+            ++totalBcpCalls;
+            bcpDuration += util::Utility::stopTimer("getBcp");
+
             //delete complementaryNewClause again
             tempFormula.erase(tempFormula.end() - 1);
 
@@ -86,6 +96,9 @@ namespace preppy::procedures {
       }
 
       formula = newFormula;
+
+      util::Utility::logInfo("Total getBcp Calls: ", totalBcpCalls);
+      util::Utility::logInfo("Total getBcp Time:  ", util::Utility::durationToString(bcpDuration));
 
       return true;
    }

@@ -13,14 +13,11 @@
 #include "Clause.h"
 #include "Utility.h"
 #include "CommandLineParser.h"
-#include "solvers/clasp.h"
 #include "procedures/BackboneSimplification.h"
-#include "procedures/BipartitionAndElimination.h"
-#include "procedures/BooleanConstraintPropagation.h"
+#include "procedures/OccurrenceSimplification.h"
 #include "procedures/Vivification.h"
 
 #include <string>
-#include <algorithm>
 
 using namespace preppy;
 
@@ -35,7 +32,10 @@ int main(const int argc, char** argv) {
    cnf::CNF testCNF;
 
    util::Utility::logOutput("Reading file \"", inputFileName, "\"");
-   testCNF.readFromFile(inputFileName);
+   
+   if (!testCNF.readFromFile(inputFileName)) {
+      return -1;
+   }
 
    auto variablesPre = testCNF.getVariables();
    auto maxVariablePre = testCNF.getMaxVariable();
@@ -51,16 +51,33 @@ int main(const int argc, char** argv) {
       maxVariablePre = testCNF.getMaxVariable();
       util::Utility::logOutput("CNF has ", variablesPre, " variables (", maxVariablePre, " max) after compression");
    }
-
-   util::Utility::startTimer("vivification");
-   procedures::Vivification procedure;
-   procedure.apply(testCNF);
-   testCNF.addProcessingTime(util::Utility::stopTimer("vivification"));
-
+   
+   {
+      util::Utility::startTimer("backbone");
+      procedures::BackboneSimplification procedure(util::Utility::getSolver());
+      procedure.apply(testCNF);
+      testCNF.addProcessingTime(util::Utility::stopTimer("backbone"));
+   }
+   
    auto variablesPost = testCNF.getVariables();
    auto maxVariablePost = testCNF.getMaxVariable();
    auto clausesPost = testCNF.getClauses();
    auto literalsPost = testCNF.getLiterals();
+
+   util::Utility::logOutput("CNF has ", variablesPost, " variables (", maxVariablePost, " max), ", clausesPost, " clauses and ", literalsPost, " literals");
+   util::Utility::logOutput("Removed ", clausesPre - clausesPost, " clauses and ", literalsPre - literalsPost, " literals");
+
+   {
+      util::Utility::startTimer("viv");
+      procedures::Vivification procedure;
+      procedure.apply(testCNF);
+      testCNF.addProcessingTime(util::Utility::stopTimer("viv"));
+   }
+
+   variablesPost = testCNF.getVariables();
+   maxVariablePost = testCNF.getMaxVariable();
+   clausesPost = testCNF.getClauses();
+   literalsPost = testCNF.getLiterals();
 
    util::Utility::logOutput("CNF has ", variablesPost, " variables (", maxVariablePost, " max), ", clausesPost, " clauses and ", literalsPost, " literals");
    util::Utility::logOutput("Removed ", clausesPre - clausesPost, " clauses and ", literalsPre - literalsPost, " literals");
