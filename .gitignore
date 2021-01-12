@@ -38,3 +38,6 @@ output/
 doc/
 .vscode/
 examples/
+
+# perf output
+perf*

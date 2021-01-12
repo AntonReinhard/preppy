@@ -23,16 +23,21 @@ namespace preppy::util {
       argp_program_version_hook = CommandLineParser::printVersion;
       CommandLineParser::args.logLevel = log::LOG_LEVEL::WARNING;
       CommandLineParser::args.force = false;
+      CommandLineParser::args.iterations = 10;
    }
 
    void CommandLineParser::parse(int argc, char **argv) {
       argp parser = { CommandLineParser::options, CommandLineParser::parseOption, CommandLineParser::argsDoc, CommandLineParser::doc };
-      argp_parse(&parser, argc, argv, 0, 0, &CommandLineParser::args);
+      error_t e = argp_parse(&parser, argc, argv, 0, 0, &CommandLineParser::args);
+
+      if (e != 0) {
+         exit(e);
+      }
 
       if (!util::Utility::fileExists(CommandLineParser::args.fileIn)) {
          //input file does not exist
          std::cout << "Input file '" << args.fileIn << "' does not exist." << std::endl;
-         exit(0);
+         exit(1);
       }
    }
 
@@ -41,12 +46,13 @@ namespace preppy::util {
       Arguments *arguments = static_cast<Arguments*>(state->input);
 
       switch (key) {
-      case 'v':      // --verbose <LOG_LEVEL>
+      case 'v':      // --verbose <LOG_LEVEL> / --logging
       {
          std::istringstream ss(arg);
          int i;
          ss >> i;
-         if (ss.fail() || i < 0 || i > static_cast<int>(log::LOG_LEVEL::DEBUG)) {
+         if (!ss.eof() || ss.fail() || i < 0 || i > static_cast<int>(log::LOG_LEVEL::DEBUG)) {
+            std::cout << "LOG_LEVEL has to be a number from 0 to 4" << std::endl;
             return 1;
          }
          arguments->logLevel = static_cast<log::LOG_LEVEL>(i);
@@ -58,6 +64,18 @@ namespace preppy::util {
       case 'f':      // --force
          arguments->force = true;
          break;
+      case 'i':      // --iterations <n>
+      {
+         std::istringstream ss(arg);
+         int n;
+         ss >> n;
+         if (!ss.eof() || ss.fail() || n < 0) {
+            std::cout << "Iterations has to be an integer >= 0" << std::endl;
+            return 1;
+         }
+         arguments->iterations = static_cast<unsigned>(n);
+         break;
+      }
       case ARGP_KEY_ARG:
          if (state->arg_num >= 1) {
             argp_usage(state);

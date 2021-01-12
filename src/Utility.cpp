@@ -66,45 +66,6 @@ namespace preppy::util {
       util::Utility::GLOBAL_LOG_LEVEL = args.logLevel;
 
       return args;
-      /*
-      if (argc <= 1) {
-         std::cout << "Usage: " << argv[0] << " [input cnf file] [options]" << std::endl;
-         return false;
-      }
-
-      if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
-         std::cout << "Usage: " << argv[0] << " [input cnf file] [options]" << std::endl;
-         std::cout << "Options:\n"
-            << "    -h        Print this help\n"
-            << "    -v <n>    Sets log level to <n>, 0=NOTHING, 1=ERROR, 2=WARNING (default), 3=INFO, 4=DEBUG"
-            << std::endl;
-         return false;
-      }
-
-      // check that first parameter is an actual file
-      if (!util::Utility::fileExists(argv[1])) {
-         std::cout << "File \"" << argv[1] << "\" doesn't exist" << std::endl;
-         return false;
-      }
-
-      for (auto i = 2; i < argc; ++i) {
-         if (strcmp(argv[i], "-v") == 0) {
-            if (i == argc - 1) { // there has to be a next option
-               std::cout << "-v option expects a log level" << std::endl;
-               return false;
-            }
-            ++i;
-            std::stringstream ss(argv[i]);
-            int tempLogLevel;
-            if (tempLogLevel < 0 || tempLogLevel > log::LOG_LEVEL::DEBUG){
-               std::cout << "Invalid log level: " << tempLogLevel << std::endl;
-               return false;
-            }
-            ss >> tempLogLevel;
-            util::Utility::GLOBAL_LOG_LEVEL = log::LOG_LEVEL(tempLogLevel);
-         }
-      }
-*/
    }
 
    std::string Utility::timeToString(const clock::duration time) {

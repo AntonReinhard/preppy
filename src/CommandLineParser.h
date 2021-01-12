@@ -25,6 +25,7 @@ namespace preppy::util {
       std::string fileIn;
       std::string fileOut;
       log::LOG_LEVEL logLevel;
+      unsigned iterations;
       bool force;
    };
 
@@ -98,11 +99,12 @@ namespace preppy::util {
        * @brief Description of the available options for this program
        * 
        */
-      const argp_option options[5] = {
-         {"verbose",       'v', "LOG_LEVEL",          0, "Set log level of the application, 0 = NOTHING, 1 = ERROR, 2 = WARNING (default), 3 = INFO, 4 = DEBUG"},
+      const argp_option options[6] = {
+         {"verbose",       'v', "<LOG_LEVEL>",        0, "Set log level of the application, 0 = NOTHING, 1 = ERROR, 2 = WARNING (default), 3 = INFO, 4 = DEBUG"},
          {"logging",       'l', 0,                    OPTION_ALIAS},
          {"output",        'o', "<FILE/DIRECTORY>",   0, "Set a output file or directory. If a directory is set the output file name will be <inputfilestem>out.cnf"},
          {"force",         'f', 0,                    0, "Override output files if they already exist"},
+         {"iterations",    'i', "<n>",                0, "How many iterations to use iterative procedures (default: 10)"},
          { 0 }
       };
       
