@@ -76,10 +76,10 @@ namespace preppy::procedures {
       }
 
       if (1 == i) {
-         util::Utility::logOutput("After ", i, " iteration of iterative procedures the formula has ", clausesStart, " clauses and ", literalsStart, " literals");
+         util::Utility::logOutput("After ", i, " iteration of iterative procedures the formula has ", formula.getClauses(), " clauses and ", formula.getLiterals(), " literals");
       }
       else {
-         util::Utility::logOutput("After ", i, " iterations of iterative procedures the formula has ", clausesStart, " clauses and ", literalsStart, " literals");
+         util::Utility::logOutput("After ", i, " iterations of iterative procedures the formula has ", formula.getClauses(), " clauses and ", formula.getLiterals(), " literals");
       }
 
       auto timeTaken = util::Utility::stopTimer("mainProcessing");

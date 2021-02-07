@@ -16,6 +16,8 @@
 #include <chrono>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <memory>
 
 namespace preppy::util {
    
@@ -53,7 +55,8 @@ namespace preppy::cnf {
    typedef std::vector<int> Literals;
    typedef std::vector<unsigned> Variables;
    class Clause;
-   typedef std::vector<cnf::Clause> Clauses;
+   typedef std::vector<std::unique_ptr<cnf::Clause>> Clauses;
+   typedef std::unordered_map<int, std::vector<cnf::Clause*>> WatchedLiteralsT;
 
    /**
     * @brief Equivalence types of CNF formulas. Every entry implies all following entries.

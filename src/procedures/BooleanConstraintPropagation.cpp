@@ -33,14 +33,17 @@ namespace preppy::procedures {
    }
 
    cnf::Literals BooleanConstraintPropagation::getBcp(cnf::CNF& formula) {
-      this->reset();
-      this->initWatchedLiterals(formula);
+      cnf::WatchedLiteralsT& watchedLiterals = formula.getWatchedLiterals();
+
+      if (watchedLiterals.empty()) {
+         return {};
+      }
 
       // Unit propagation -> find unit clauses
       cnf::Literals units;
       for (const auto& clause : formula) {
-         if (clause.size() == 1) {
-            units.push_back(clause[0]);
+         if (clause->size() == 1) {
+            units.push_back((*clause)[0]);
          }
       }
       
@@ -50,8 +53,7 @@ namespace preppy::procedures {
 
       for (size_t i = 0; i < units.size(); ++i) {
          auto literal = units[i];
-         size_t index = std::abs(2 * literal) + (literal < 0);  // use < here because the negated literal needs to be checked now
-         std::vector<cnf::Clause*>& watched = watchedLiterals[index];
+         std::vector<cnf::Clause*>& watched = watchedLiterals[-literal];
 
          for (auto& clause : watched) {
             // check if the clause is satisfied
@@ -73,8 +75,7 @@ namespace preppy::procedures {
                // there's 2 or more literals
                // choose a new literal to watch
                // we always watch the first two, so without the one currently being propagated, start watching the second now
-               size_t newIndex = std::abs(2 * partialClause[1]) + (partialClause[1] > 0);
-               watchedLiterals[newIndex].push_back(clause);
+               watchedLiterals[partialClause[1]].push_back(clause);
             }
          }
       }
@@ -86,8 +87,8 @@ namespace preppy::procedures {
       // set literals on all clauses and remove the ones that are satisfied
       formula.erase(
          std::remove_if(formula.begin(), formula.end(),
-            [&](cnf::Clause& clause){
-               return clause.setLiteral(literal);
+            [&](std::unique_ptr<cnf::Clause>& clause){
+               return clause->setLiteral(literal);
             }
          ),
          formula.end()
@@ -97,7 +98,7 @@ namespace preppy::procedures {
 
    void BooleanConstraintPropagation::applySingleLiteralEq(cnf::CNF& formula, const int literal) const {
       this->applySingleLiteral(formula, literal);
-      formula.push_back(cnf::Clause{literal});
+      formula.push_back(std::make_unique<cnf::Clause>(std::initializer_list<int>({literal})));
    }
 
    void BooleanConstraintPropagation::applyLiterals(cnf::CNF& formula, const cnf::Literals& literals) const {
@@ -109,28 +110,6 @@ namespace preppy::procedures {
    void BooleanConstraintPropagation::applyLiteralsEq(cnf::CNF& formula, const cnf::Literals& literals) const {
       for (const auto& literal : literals) {
          this->applySingleLiteralEq(formula, literal);
-      }
-   }
-
-   void BooleanConstraintPropagation::reset() {
-      this->watchedLiterals.clear();
-   }
-
-   void BooleanConstraintPropagation::initWatchedLiterals(cnf::CNF& formula) {
-      // 2l points is for literal -l, index 2l + 1 for literal l
-      this->watchedLiterals.resize(2 * (formula.getMaxVariable() + 2));
-
-      for (auto& clause : formula) {
-         if (clause.size() <= 1) {
-            // nothing to be done
-            continue;
-         }
-
-         //if there's at least 2 literals, add the first two literals of the clause to the watched literals
-         size_t index = std::abs(2 * clause[0]) + (clause[0] > 0);
-         watchedLiterals[index].push_back(&clause);
-         index = std::abs(2 * clause[1]) + (clause[1] > 0);
-         watchedLiterals[index].push_back(&clause);
       }
    }
 

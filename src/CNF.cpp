@@ -29,13 +29,25 @@ namespace preppy::cnf {
 
    }
 
-   CNF::CNF(std::initializer_list<Clauses::value_type> l)
-      : clauses(l)
-      , variablesDirtyBit(true)
-      , maxVariableDirtyBit(true)
-      , totalProcessingTime(0)
-      , equivalence(EQUIVALENCE_TYPE::EQUIVALENT) {
+   CNF::CNF(const cnf::CNF& other) {
+      *this = other;
+   }
 
+   cnf::CNF& CNF::operator=(const cnf::CNF& other) {
+      if (&other == this) {
+         return *this;
+      }
+
+      this->name = other.name;
+      this->source = other.source;
+      this->totalProcessingTime = other.totalProcessingTime;
+      this->procedures = other.procedures;
+      this->equivalence = other.equivalence;
+
+      for (const auto& clause : other) {
+         this->push_back(std::make_unique<cnf::Clause>(*clause));
+      }
+      return *this;
    }
 
    CNF CNF::getMetadataCopy() const {
@@ -58,7 +70,7 @@ namespace preppy::cnf {
       // collect all variables used in the formula
       std::set<unsigned> variables;
       for (const auto& clause : *this) {
-         for (const int var : clause) {
+         for (const int var : *clause) {
             variables.insert(std::abs(var));
          }
       }
@@ -122,7 +134,7 @@ namespace preppy::cnf {
 
    void CNF::renameVariable(const unsigned variable, const unsigned newName) {
       for (auto& clause : *this) {
-         clause.renameVariable(variable, newName);
+         clause->renameVariable(variable, newName);
       }
       this->maxVariableDirtyBit = true;
       this->variablesDirtyBit = true;
@@ -130,7 +142,7 @@ namespace preppy::cnf {
 
    void CNF::joinFormula(const cnf::CNF& formula) {
       for (const auto& clause : formula) {
-         this->push_back(clause);
+         this->push_back(std::make_unique<cnf::Clause>(*clause));
       }
       this->maxVariableDirtyBit = true;
       this->variablesDirtyBit = true;
@@ -140,7 +152,7 @@ namespace preppy::cnf {
       // literal is not part of the formula anymore, so take biggest variable and rename it to literal's variable name
       
       for (auto& clause : *this) {
-         clause.renameVariable(this->getMaxVariable(), std::abs(literal));
+         clause->renameVariable(this->getMaxVariable(), std::abs(literal));
       }
       this->maxVariable--;
       this->compressionInformation.emplace_back(this->getMaxVariable(), std::abs(literal), (literal>0));
@@ -183,6 +195,7 @@ namespace preppy::cnf {
             ss >> clauses;
             util::Utility::logInfo("Read problem line: ", variables, " variables and ", clauses, " clauses");
             
+            this->reserve(clauses * 1.2);
             problemLineFound = true;
          }
          else {
@@ -199,9 +212,9 @@ namespace preppy::cnf {
 
       unsigned maxVar = 0;
       for (const auto& clausestring : clausestrings) {
-         this->push_back(Clause(clausestring));
+         this->push_back(std::make_unique<Clause>(clausestring));
          
-         unsigned v = this->back().getMaxVariable();
+         unsigned v = this->back()->getMaxVariable();
          
          if (v >= maxVar) {
             maxVar = v;
@@ -229,7 +242,7 @@ namespace preppy::cnf {
    std::string CNF::toString() const {
       std::stringstream ss;
       for (const auto& clause : *this) {
-         ss << clause.toString() << "\n";
+         ss << clause->toString() << "\n";
       }
       return ss.str();
    }
@@ -275,7 +288,7 @@ namespace preppy::cnf {
       file << this->getFileHeader();
 
       for (const auto& clause : *this) {
-         file << clause.toCNFLine();
+         file << clause->toCNFLine();
       }
 
       file.close();
@@ -326,7 +339,7 @@ namespace preppy::cnf {
       if (this->variablesDirtyBit) {
          std::set<unsigned> variables;
          for (const auto& clause : *this) {
-            for (const int var : clause) {
+            for (const int var : *clause) {
                variables.insert(std::abs(var));
             }
          }
@@ -341,8 +354,8 @@ namespace preppy::cnf {
       if (this->maxVariableDirtyBit) {
          unsigned maxVar = 0;
          for (const auto& clause : *this) {
-            if (clause.getMaxVariable() > maxVar) {
-               maxVar = clause.getMaxVariable();
+            if (clause->getMaxVariable() > maxVar) {
+               maxVar = clause->getMaxVariable();
             }
          }
          this->maxVariable = maxVar;
@@ -359,7 +372,7 @@ namespace preppy::cnf {
    unsigned CNF::getLiterals() const {
       unsigned totalLiterals = 0;
       for (const auto& clause : *this) {
-         totalLiterals += clause.size();
+         totalLiterals += clause->size();
       }
       return totalLiterals;
    }
@@ -376,7 +389,7 @@ namespace preppy::cnf {
    std::vector<unsigned> CNF::countVariables() {
       std::vector<unsigned> varCount(this->getMaxVariable() + 1);
       for (const auto& clause : *this) {
-         for (const auto& literal : clause) {
+         for (const auto& literal : *clause) {
             varCount[std::abs(literal)]++;
          }
       }
@@ -396,6 +409,10 @@ namespace preppy::cnf {
 
    void CNF::addProcessingTime(const util::clock::duration& duration) {
       this->totalProcessingTime += duration;
+   }
+
+   WatchedLiteralsT& CNF::getWatchedLiterals() {
+      return this->watchedLiterals;
    }
 
    std::string equivalenceTypeToString(cnf::EQUIVALENCE_TYPE eqType) {

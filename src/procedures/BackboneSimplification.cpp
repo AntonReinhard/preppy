@@ -87,7 +87,7 @@ namespace preppy::procedures {
          // currently used literal, compress
          const int currentLiteral = /*workingFormula.compress*/(remainingLiterals[0]);
 
-         workingFormula.push_back(cnf::Clause{-currentLiteral});     // add negated literal
+         workingFormula.push_back(std::make_unique<cnf::Clause>(std::initializer_list<int>({-currentLiteral})));     // add negated literal
          cnf::Model model = this->solver->getModel(workingFormula);
          
          if (model.empty()) {

@@ -35,20 +35,20 @@ namespace preppy::procedures {
 
          for (auto& clause : formula) {
             // unit clauses can't have their literals removed by this anyways -> skip
-            if (clause.size() == 1) {
+            if (clause->size() == 1) {
                continue;
             }
             // consider only clauses that contain the literal
-            if (!clause.containsLiteral(literal)) {
+            if (!clause->containsLiteral(literal)) {
                continue;
             }
 
             // make possible new clause
-            cnf::Clause newClause = clause;
+            cnf::Clause newClause = *clause;
             newClause.erase(std::find(newClause.begin(), newClause.end(), literal));
             
-            formula.push_back(newClause.getComplement());
-            formula.push_back({literal});
+            formula.push_back(std::make_unique<cnf::Clause>(newClause.getComplement()));
+            formula.push_back(std::make_unique<cnf::Clause>(std::initializer_list<int>({literal})));
             cnf::Literals bcpLiterals = bcp.getBcp(formula);
             // remove the two clauses again
             formula.pop_back();
@@ -56,15 +56,15 @@ namespace preppy::procedures {
 
             if (!bcpLiterals.empty() && bcpLiterals[0] == 0) {
                // if it became unsatisfiable the literal can be removed from the clause
-               clause.erase(std::find(clause.begin(), clause.end(), literal));
+               clause->erase(std::find(clause->begin(), clause->end(), literal));
             }
          }
       }
 
       //remove any clauses that became empty
       formula.erase(
-         std::remove_if(formula.begin(), formula.end(), [](const cnf::Clause& clause){
-            return clause.size() == 0;
+         std::remove_if(formula.begin(), formula.end(), [](const std::unique_ptr<cnf::Clause>& clause){
+            return clause->size() == 0;
          }), 
          formula.end()
       );
@@ -90,7 +90,7 @@ namespace preppy::procedures {
 
       // Collect their number of occurrences
       for (const auto& clause : formula) {
-         for (const auto& literal : clause) {
+         for (const auto& literal : *clause) {
             ++literalOccurenceMap[literal];
          }
       }

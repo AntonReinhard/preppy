@@ -31,8 +31,8 @@ namespace preppy::procedures {
       util::clock::duration bcpDuration(0);
 
       while (formula.size() != 0) {
-         // take first clause and delete it from the formula
-         cnf::Clause currentClause = formula[0];
+         // copy first clause and delete it from the formula
+         std::unique_ptr<cnf::Clause> currentClause = std::make_unique<cnf::Clause>(*formula[0]);
          formula.erase(formula.begin());
 
          cnf::Clause newClause;
@@ -48,15 +48,15 @@ namespace preppy::procedures {
 
          bool satisfied = false;
 
-         while (currentClause.size() != 0) {
+         while (currentClause->size() != 0) {
             // choose literal from currentClause such that its negation is not part of bcpLiterals
             int l = 0;
-            for (size_t i = 0; i < currentClause.size(); ++i) {
-               int lit = currentClause[i];
+            for (size_t i = 0; i < currentClause->size(); ++i) {
+               int lit = (*currentClause)[i];
                if (std::find(bcpLiterals.begin(), bcpLiterals.end(), -lit) == bcpLiterals.end()) {
                   // -l wasn't found -> choose this l
                   l = lit;
-                  currentClause.erase(currentClause.begin() + i);
+                  currentClause->erase(currentClause->begin() + i);
                   break;
                }
             }
@@ -69,11 +69,8 @@ namespace preppy::procedures {
             // add l to newClause
             newClause.push_back(l);
 
-            // get complementary clause (consisting of all negated literals)
-            cnf::Clause complementaryNewClause = newClause.getComplement();
-
             // take bcp of formula ∪ newFormula
-            tempFormula.push_back(complementaryNewClause);
+            tempFormula.push_back(std::make_unique<cnf::Clause>(newClause.getComplement()));
 
             util::Utility::startTimer("getBcp");
             bcpLiterals = bcp.getBcp(tempFormula);
@@ -91,7 +88,7 @@ namespace preppy::procedures {
          }
 
          if (!satisfied) {
-            newFormula.push_back(newClause);
+            newFormula.push_back(std::make_unique<cnf::Clause>(newClause));
          }
       }
 

@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <initializer_list>
 #include <tuple>
+#include <algorithm>
 
 namespace preppy::cnf {
 
@@ -41,6 +42,21 @@ namespace preppy::cnf {
        * @param l initializer list of clauses
        */
       CNF(std::initializer_list<Clauses::value_type> l);
+
+      /**
+       * @brief Copy a CNF
+       * 
+       * @param other The CNF to copy
+       */
+      CNF(const cnf::CNF& other);
+
+      /**
+       * @brief Copy other to this
+       * 
+       * @param other The CNF to copy
+       * @return CNF& A reference to this
+       */
+      CNF& operator=(const cnf::CNF& other);
 
       /**
        * @brief Get a CNF with the same Metadata as this CNF, but no clauses
@@ -218,6 +234,13 @@ namespace preppy::cnf {
        */
       void addProcessingTime(const util::clock::duration& duration);
 
+      /**
+       * @brief Get a reference to this formula's watched literals
+       * 
+       * @return WatchedLiteralsT& The reference to the watched literals
+       */
+      WatchedLiteralsT& getWatchedLiterals();
+
 #pragma region vectorfunctions
    //Put function definitions here for compiler optimizations and inlining
 
@@ -270,25 +293,34 @@ namespace preppy::cnf {
    }
 
    void push_back(const Clauses::value_type& val) {
-      this->clauses.push_back(val);
+      this->clauses.push_back(std::make_unique<cnf::Clause>(*val));
+      this->addClauseToWatchLiterals(this->clauses.back().get());
    }
 
    void push_back(Clauses::value_type&& val) {
-      this->clauses.push_back(val);
+      this->clauses.push_back(std::move(val));
+      this->addClauseToWatchLiterals(this->clauses.back().get());
    }
 
    void pop_back() {
+      this->removeClauseFromWatchLiterals(this->clauses.back().get());
       this->clauses.pop_back();
    }
 
    Clauses::iterator erase(Clauses::const_iterator position) {
+      this->removeClauseFromWatchLiterals((*this)[position - this->begin()].get());
       return this->clauses.erase(position);
    }
 
    Clauses::iterator erase(Clauses::const_iterator first, Clauses::const_iterator last) {
+      auto it = first;
+      while (it != last) {
+         this->removeClauseFromWatchLiterals((*this)[it - this->begin()].get());
+         ++it;
+      }
       return this->clauses.erase(first, last);
    }
-
+/*
    Clauses::iterator insert(Clauses::const_iterator position, const Clauses::value_type& val) {
       return this->clauses.insert(position, val);
    }
@@ -303,10 +335,11 @@ namespace preppy::cnf {
 
    Clauses::iterator insert(Clauses::const_iterator position, std::initializer_list<Clauses::value_type> il) {
       return this->clauses.insert(position, il);
-   }
+   }*/
 
    void clear() noexcept {
       this->clauses.clear();
+      this->watchedLiterals.clear();
    }
 
    void reserve(Clauses::size_type n) {
@@ -321,9 +354,9 @@ namespace preppy::cnf {
       this->clauses.resize(n);
    }
 
-   void resize(Clauses::size_type n, const Clauses::value_type& val) {
+   /*void resize(Clauses::size_type n, const Clauses::value_type& val) {
       this->clauses.resize(n, val);
-   }
+   }*/
 
    Clauses::size_type size() const noexcept {
       return this->clauses.size();
@@ -337,6 +370,40 @@ namespace preppy::cnf {
 
    protected:
 
+      /**
+       * @brief Adds a clause to the watched literals.
+       * @note Is only called by the vector functions to keep the watched literals accurate at all times
+       * 
+       * @param clause The pointer to the clause to add
+       */
+      void addClauseToWatchLiterals(cnf::Clause* clause) {
+         if (clause->size() <= 1) {
+            // nothing to be done
+            return;
+         }
+
+         //if there's at least 2 literals, add the first two literals of the clause to the watched literals
+         this->watchedLiterals[(*clause)[0]].push_back(clause);
+         this->watchedLiterals[(*clause)[1]].push_back(clause);
+      }
+
+      /**
+       * @brief Removes a clause from the watched literals.
+       * @note Is only called by vector functions to keep the watched literals accurate at all times
+       * 
+       * @param clause The pointer to the clause to remove. The clause has to still exist when calling this
+       */
+      void removeClauseFromWatchLiterals(cnf::Clause* clause) {
+         for (int literal : *clause) {
+            auto& clauses = this->watchedLiterals[literal];
+            clauses.erase(
+               std::remove_if(clauses.begin(), clauses.end(), [&clause](cnf::Clause* c)->bool{
+                  return c == clause;
+               }),
+               clauses.end()
+            );
+         }
+      }
 
    private:
 
@@ -407,6 +474,14 @@ namespace preppy::cnf {
        * 
        */
       std::vector<std::tuple<unsigned, unsigned, bool>> compressionInformation;
+
+      /**
+       * @brief Saves pointers to clauses, each clause is in here exactly twice (except for unit clauses)
+       * 
+       * @details This is used primarily by the BooleanConstraintPropagation procedure. It is stored in this class because
+       * otherwise the procedure has to rebuild it in every iteration, which is very slow.
+       */
+      WatchedLiteralsT watchedLiterals;
 
    };
 

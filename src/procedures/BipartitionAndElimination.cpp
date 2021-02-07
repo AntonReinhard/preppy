@@ -125,8 +125,8 @@ namespace preppy::procedures {
       // add clauses from the copy to working Formula
       workingFormula.joinFormula(copyFormula);
 
-      workingFormula.push_back(cnf::Clause{int(x)});
-      workingFormula.push_back(cnf::Clause{-int(xPrime)});
+      workingFormula.push_back(std::make_unique<cnf::Clause>(std::initializer_list<int>({int(x)})));
+      workingFormula.push_back(std::make_unique<cnf::Clause>(std::initializer_list<int>({-int(xPrime)})));
 
       return !util::Utility::getSolver()->isSatisfiable(workingFormula);
    }
