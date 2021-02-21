@@ -256,7 +256,7 @@ namespace preppy::cnf {
             util::Utility::logWarning("CNF doesn't have an original file name, using default 'out'");
          }
          else {
-            origFileName = this->source.stem();
+            origFileName = this->source.stem().string();
          }
          origFileName += "out";
          filePath = path + origFileName;
@@ -267,10 +267,10 @@ namespace preppy::cnf {
          filePath = path;
       }
 
-      util::Utility::logDebug("Writing CNF to file ", filePath);
+      util::Utility::logDebug("Writing CNF to file ", filePath.string());
 
-      if (!force && util::Utility::fileExists(filePath)) {
-         util::Utility::logWarning("File ", filePath, " already exists, use -f to force override");
+      if (!force && util::Utility::fileExists(filePath.string())) {
+         util::Utility::logWarning("File ", filePath.string(), " already exists, use -f to force override");
          return false;
       }
 

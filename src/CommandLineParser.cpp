@@ -13,26 +13,41 @@
 #include "Utility.h"
 
 #include <sstream>
+
+#ifndef WIN32
 #include <argp.h>
+#endif
 
 namespace preppy::util {
 
    Arguments CommandLineParser::args;
 
    CommandLineParser::CommandLineParser() {
+#ifndef WIN32
       argp_program_version_hook = CommandLineParser::printVersion;
+#endif
       CommandLineParser::args.logLevel = log::LOG_LEVEL::WARNING;
       CommandLineParser::args.force = false;
       CommandLineParser::args.iterations = 10;
    }
 
    void CommandLineParser::parse(int argc, char **argv) {
+#ifndef WIN32
       argp parser = { CommandLineParser::options, CommandLineParser::parseOption, CommandLineParser::argsDoc, CommandLineParser::doc };
       error_t e = argp_parse(&parser, argc, argv, 0, 0, &CommandLineParser::args);
 
       if (e != 0) {
          exit(e);
       }
+#else
+      // for now just standard definitions in case of windows, in the long term implment
+      // some basic version of argp
+      args.fileIn = "input.cnf";
+      args.fileOut = "output.cnf";
+      args.force = true;
+      args.iterations = 1;
+      args.logLevel = log::LOG_LEVEL::DEBUG;
+#endif
 
       if (!util::Utility::fileExists(CommandLineParser::args.fileIn)) {
          //input file does not exist
@@ -41,6 +56,7 @@ namespace preppy::util {
       }
    }
 
+#ifndef WIN32
    error_t CommandLineParser::parseOption(int key, char *arg, struct argp_state *state) {
       // input will contain the Argument struct
       Arguments *arguments = static_cast<Arguments*>(state->input);
@@ -92,6 +108,7 @@ namespace preppy::util {
       }
       return 0;
    }
+#endif
 
    Arguments CommandLineParser::getArguments() const {
       return CommandLineParser::args;

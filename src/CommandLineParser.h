@@ -13,7 +13,29 @@
 
 #include "definitions.h"
 
+#ifndef WIN32
 #include <argp.h>
+#else
+// alternate definitions in case of windows compilation
+enum error_t {
+   SUCCESS = 0,
+   ARGP_ERROR_UNKNOWN = 1
+};
+
+struct argp_option {
+   std::string name;          // long version of the option
+   char abbr;                 // short version of the option, or identifier
+   std::string hint;          // hint for writing the command template
+   int type;                  // alias or no
+   std::string description;   // long description of the option
+};
+
+enum {
+   OPTION_SINGLE = 0,
+   OPTION_ALIAS = 1
+};
+
+#endif
 
 namespace preppy::util {
 
@@ -59,6 +81,7 @@ namespace preppy::util {
 
    protected:
 
+#ifndef WIN32
       /**
        * @brief Argp parse_opt function implementation
        * 
@@ -80,6 +103,7 @@ namespace preppy::util {
             std::cout << str << std::endl;
          }
       }
+#endif
 
    private:
 
@@ -95,6 +119,7 @@ namespace preppy::util {
        */
       const char *argsDoc = "<INPUT FILE>";
 
+#ifndef WIN32
       /**
        * @brief Description of the available options for this program
        * 
@@ -107,6 +132,7 @@ namespace preppy::util {
          {"iterations",    'i', "<n>",                0, "How many iterations to use iterative procedures (default: 10)"},
          { 0 }
       };
+#endif
       
       /**
        * @brief The globally set arguments

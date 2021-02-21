@@ -15,7 +15,6 @@
 #include "solvers/clasp.h"
 
 #include <sys/stat.h>
-#include <unistd.h>
 #include <iomanip>
 #include <string>
 #include <chrono>
@@ -24,10 +23,13 @@
 #include <random>
 #include <filesystem>
 #include <csignal>
+#include <array>
+#include <csignal>
+
+#ifndef WIN32
 #include <unistd.h>
 #include <sys/wait.h>
-#include <string.h>
-#include <argp.h>
+#endif
 
 namespace preppy::util {
 
@@ -117,14 +119,21 @@ namespace preppy::util {
    void Utility::initializeSignalHandling() {
       logDebug("Initializing signal handling");
       // Configures signal handling.
+
+#ifndef WIN32
       struct sigaction sig_int_handler;
       sig_int_handler.sa_handler = SignalHandler;
       sigemptyset(&sig_int_handler.sa_mask);
       sig_int_handler.sa_flags = 0;
       sigaction(SIGINT, &sig_int_handler, NULL);
+#else
+      signal(SIGINT, Utility::SignalHandler);
+      signal(SIGABRT, Utility::SignalHandler);
+      signal(SIGTERM, Utility::SignalHandler);
+#endif
    }
 
-   void Utility::SignalHandler(int signal) {
+   void Utility::SignalHandler(const int signal) {
       Utility::logError("Caught signal ", signal, ", terminating...");
       Utility::cleanup();
       exit(0);
@@ -133,7 +142,12 @@ namespace preppy::util {
    std::string Utility::systemCall(const std::string& command) {    
       std::array<char, 128> buffer;
       std::string result;
+#ifndef WIN32
       std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
+#else
+      // find some way to do system calls on windows
+      std::unique_ptr<FILE> pipe = nullptr;
+#endif
       if (!pipe) {
          Utility::logError("System call \"", command, "\" failed");
          return std::string();
