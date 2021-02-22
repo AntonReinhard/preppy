@@ -115,6 +115,17 @@ namespace preppy::cnf {
        */
       unsigned getMaxVariable() const;
 
+      /**
+       * @brief Resolves this clause with another and returns the resolvent
+       * 
+       * @param other The other clause to resolve with
+       * @param var (optional) The variable to resolve on
+       * @return The resolvent of this and the other clause
+       * @details If the clauses can't be resolved this will return {0}, if more than one pair of variables
+       * exists that could be resolved on this will return {}
+       */
+      Clause resolve(const Clause& other, int var = 0) const;
+
 #pragma region vectorfunctions
    //Put function definitions here for compiler optimizations and inlining
 

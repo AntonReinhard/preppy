@@ -19,7 +19,7 @@ namespace preppy::procedures {
     * @brief Class implementing Vivification as a procedure
     * 
     * @details For the original algorithm see: https://www.cril.univ-artois.fr/KC/documents/lagniez-marquis-aaai14.pdf
-    * Application of this procedure will result in an equivalent output fourmla
+    * Should take a look at https://www.cril.univ-artois.fr/~piette/revival/revival.pdf
     */
    class Vivification
       : public preppy::procedures::Procedure {

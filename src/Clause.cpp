@@ -134,4 +134,48 @@ namespace preppy::cnf {
       return max;
    }
 
+   Clause Clause::resolve(const Clause& other, int var) const {
+      // make sure var is always positive
+      var = std::abs(var);
+      if (0 == var) {
+         // if no var is given, find a variable to resolve on
+         int foundPairs;
+         for (const int& v : *this) {
+            for (const int& vOther : other) {
+               if (v == -vOther) {
+                  if (foundPairs > 0) {
+                     // if there's more than one pair to resolve on the resolvent will be a tautology anyways
+                     return {};
+                  }
+                  var = std::abs(v);
+                  foundPairs++;
+                  break;
+               }
+            }
+         }
+         if (0 == foundPairs) {
+            // can't resolve
+            return {0};
+         }
+      }
+
+      // we'll just assume that if a var was given that it's okay to resolve on
+      // create new clause adding all of the given clauses' variables except for var
+      Clause resolvent;
+      resolvent.reserve(this->size() + other.size());
+      for (const int& v : *this) {
+         if (std::abs(v) == var) {
+            continue;
+         }
+         resolvent.push_back(v);
+      }
+      for (const int& v : other) {
+         if (std::abs(v) == var) {
+            continue;
+         }
+         resolvent.push_back(v);
+      }
+
+      return resolvent;
+   }
 }
