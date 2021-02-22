@@ -24,8 +24,6 @@ namespace preppy::procedures {
    }
 
    bool OccurrenceSimplification::impl(cnf::CNF& formula) {
-      procedures::BooleanConstraintPropagation bcp;
-
       cnf::Literals literals = this->getIncidenceSortedLiterals(formula);
 
       while (!literals.empty()) {
@@ -33,32 +31,7 @@ namespace preppy::procedures {
          const int literal = literals[0];
          literals.erase(literals.begin());
 
-         for (auto& clause : formula) {
-            // unit clauses can't have their literals removed by this anyways -> skip
-            if (clause->size() == 1) {
-               continue;
-            }
-            // consider only clauses that contain the literal
-            if (!clause->containsLiteral(literal)) {
-               continue;
-            }
-
-            // make possible new clause
-            cnf::Clause newClause = *clause;
-            newClause.erase(std::find(newClause.begin(), newClause.end(), literal));
-            
-            formula.push_back(std::make_unique<cnf::Clause>(newClause.getComplement()));
-            formula.push_back(std::make_unique<cnf::Clause>(std::initializer_list<int>({literal})));
-            cnf::Literals bcpLiterals = bcp.getBcp(formula);
-            // remove the two clauses again
-            formula.pop_back();
-            formula.pop_back();
-
-            if (!bcpLiterals.empty() && bcpLiterals[0] == 0) {
-               // if it became unsatisfiable the literal can be removed from the clause
-               clause->erase(std::find(clause->begin(), clause->end(), literal));
-            }
-         }
+         this->applySingleLiteral(formula, literal);
       }
 
       //remove any clauses that became empty
@@ -70,6 +43,37 @@ namespace preppy::procedures {
       );
 
       return false;
+   }
+
+   void OccurrenceSimplification::applySingleLiteral(cnf::CNF& formula, int literal) {
+      procedures::BooleanConstraintPropagation bcp;
+
+      for (auto& clause : formula) {
+         // unit clauses can't have their literals removed by this anyways -> skip
+         if (clause->size() == 1) {
+            continue;
+         }
+         // consider only clauses that contain the literal
+         if (!clause->containsLiteral(literal)) {
+            continue;
+         }
+
+         // make possible new clause
+         cnf::Clause newClause = *clause;
+         newClause.erase(std::find(newClause.begin(), newClause.end(), literal));
+         
+         formula.push_back(std::make_unique<cnf::Clause>(newClause.getComplement()));
+         formula.push_back(std::make_unique<cnf::Clause>(std::initializer_list<int>({literal})));
+         cnf::Literals bcpLiterals = bcp.getBcp(formula);
+         // remove the two clauses again
+         formula.pop_back();
+         formula.pop_back();
+
+         if (!bcpLiterals.empty() && bcpLiterals[0] == 0) {
+            // if it became unsatisfiable the literal can be removed from the clause
+            clause->erase(std::find(clause->begin(), clause->end(), literal));
+         }
+      }
    }
 
    cnf::Literals OccurrenceSimplification::getIncidenceSortedLiterals(cnf::CNF& formula) const {

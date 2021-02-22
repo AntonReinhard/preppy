@@ -73,8 +73,22 @@ namespace preppy::procedures {
        */
       bool isDefined(const unsigned x, const cnf::CNF& formula, const cnf::Variables& variables) const;
 
+      /**
+       * @brief Sorts the given variables such that the number of clauses that a variable appears in as negative
+       * literal and number of clauses that it appears in as a positive literal multiplied sorted lowest to highest
+       * 
+       * @param formula The formula to count clauses in
+       * @param variables The variables to sort
+       */
+      static void sort(const cnf::CNF& formula, cnf::Variables& variables);
+
    private:
 
+      /**
+       * @brief max#Res from the paper to decide whether a certain variable x will be retained
+       * 
+       */
+      constexpr static int maxNumberRes = 500;
 
    };
 

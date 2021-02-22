@@ -31,6 +31,12 @@ namespace preppy::procedures {
        */
       OccurrenceSimplification();
 
+      /**
+       * @brief Apply Occurrence Simplification to a single literal
+       * 
+       */
+      void applySingleLiteral(cnf::CNF& formula, int literal);
+
    protected:
 
       /**
@@ -40,6 +46,12 @@ namespace preppy::procedures {
        * @return bool True on success
        */
       bool impl(cnf::CNF& formula) override;
+
+      /**
+       * @brief Apply Occurrence Simplification to a single literal
+       * 
+       */
+      void applySingleLiteral(cnf::CNF& formula, unsigned variable);
 
    private:
 

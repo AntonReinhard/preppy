@@ -12,6 +12,8 @@
 #include "BipartitionAndElimination.h"
 #include "BackboneSimplification.h"
 #include "BooleanConstraintPropagation.h"
+#include "Vivification.h"
+#include "OccurrenceSimplification.h"
 #include "../solvers/clasp.h"
 #include "../definitions.h"
 
@@ -51,7 +53,7 @@ namespace preppy::procedures {
       cnf::Variables appearances = workingFormula.countVariables();
       std::vector<std::pair<unsigned, unsigned>> sortedAppearances;     // first = variable, second = number of appearances
 
-      for (size_t i = 1; i < appearances.size(); ++i) {
+      for (std::size_t i = 1; i < appearances.size(); ++i) {
          //if it's in the backbone we don't need to add
          //so it's only added if it's not in the backbone
          if (std::find(backboneVariables.begin(), backboneVariables.end(), i) == backboneVariables.end()) { 
@@ -69,9 +71,9 @@ namespace preppy::procedures {
 
       util::Utility::logDebug("Sorted");
 
-      for (size_t i = 0; i < sortedAppearances.size(); ++i) {
+      for (std::size_t i = 0; i < sortedAppearances.size(); ++i) {
          cnf::Variables definitionSet = inputVariables;
-         for (size_t j = i+1; j < sortedAppearances.size(); ++j) {
+         for (std::size_t j = i+1; j < sortedAppearances.size(); ++j) {
             definitionSet.push_back(sortedAppearances[j].first);
          }
          
@@ -89,7 +91,66 @@ namespace preppy::procedures {
    }
 
    void BipartitionAndElimination::eliminate(cnf::CNF& formula, cnf::Variables variables) const {
+      cnf::CNF workingFormula = formula;
 
+      procedures::Vivification vivification;
+      procedures::OccurrenceSimplification occurrenceSimplification;
+
+      bool iterate = true;
+
+      while (iterate) {
+
+         // line 4
+         cnf::Variables Eliminate = variables;
+         variables.clear();
+         iterate = false;
+
+         // line 5
+         vivification.apply(workingFormula);
+
+         // line 6
+         while (!Eliminate.empty()) {
+            // line 7
+            this->sort(workingFormula, Eliminate);
+            unsigned x = variables[0];
+
+            // line 8
+            variables.erase(variables.begin());
+
+            // line 9
+            occurrenceSimplification.applySingleLiteral(workingFormula, static_cast<int>(x));
+            occurrenceSimplification.applySingleLiteral(workingFormula, -static_cast<int>(x));
+
+            // line 10
+            int occurrencesPos = 0;
+            int occurrencesNeg = 0;
+
+            for (const auto& clause : formula) {
+               if (std::find(clause->begin(), clause->end(), x) != clause->end()) {
+                  occurrencesPos++;
+               }
+               if (std::find(clause->begin(), clause->end(), -x) != clause->end()) {
+                  occurrencesNeg++;
+               }
+            }
+
+            if (occurrencesNeg * occurrencesPos > maxNumberRes) {
+               // line 11  -> possibly postpone elimination
+               variables.emplace_back(x);
+            }
+            // line 12
+            else {
+               // line 13
+               
+
+
+
+            }
+         }
+      }
+
+
+      formula = workingFormula;
    }
 
    bool BipartitionAndElimination::isDefined(const unsigned x, const cnf::CNF& formula, const cnf::Variables& variables/*, unsigned maxC*/) const {
@@ -130,4 +191,28 @@ namespace preppy::procedures {
 
       return !util::Utility::getSolver()->isSatisfiable(workingFormula);
    }
+
+   void BipartitionAndElimination::sort(const cnf::CNF& formula, cnf::Variables& variables) {
+      std::unordered_map<int, int> occurences;
+      for (int var : variables) {
+         occurences[var] = 0;
+         occurences[-var] = 0;
+      }
+
+      for (const auto& clause : formula) {
+         for (int var : variables) {
+            if (std::find(clause->begin(), clause->end(), var) != clause->end()) {
+               occurences[var]++;
+            }
+            if (std::find(clause->begin(), clause->end(), -var) != clause->end()) {
+               occurences[-var]++;
+            }
+         }
+      }
+
+      std::sort(variables.begin(), variables.end(), [&occurences](int var1, int var2){
+         return occurences[var1] * occurences[-var1] < occurences[var2] * occurences[-var2];
+      });
+   }
+
 }
